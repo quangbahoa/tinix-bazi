@@ -648,19 +648,45 @@
 }
 
 .markdown-body {
-    line-height: 1.8;
-    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.85;
+    color: rgba(255, 255, 255, 0.95);
     font-size: 1.1rem;
+}
+
+.markdown-body > * {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: staggerIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.markdown-body > *:nth-child(1) { animation-delay: 0.1s; }
+.markdown-body > *:nth-child(2) { animation-delay: 0.2s; }
+.markdown-body > *:nth-child(3) { animation-delay: 0.3s; }
+.markdown-body > *:nth-child(4) { animation-delay: 0.4s; }
+.markdown-body > *:nth-child(5) { animation-delay: 0.5s; }
+.markdown-body > *:nth-child(6) { animation-delay: 0.6s; }
+.markdown-body > *:nth-child(7) { animation-delay: 0.7s; }
+.markdown-body > *:nth-child(8) { animation-delay: 0.8s; }
+.markdown-body > *:nth-child(9) { animation-delay: 0.9s; }
+.markdown-body > *:nth-child(10) { animation-delay: 1.0s; }
+
+@keyframes staggerIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3 {
+    font-family: var(--font-accent);
     color: var(--accent-gold);
     margin-top: 2.5rem;
     margin-bottom: 1.2rem;
-    border-bottom: 1px solid rgba(226, 192, 68, 0.2);
-    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 0.6rem;
+    letter-spacing: -0.01em;
 }
 
 .markdown-body h3 {
