@@ -1,4 +1,4 @@
-# 🏮 Huyền Cơ Bát Tự — BaZi Analysis Platform
+# 🏮 Viet Lac So — BaZi Analysis Platform
 
 > Nền tảng phân tích Tứ Trụ (Bát Tự) chuyên sâu, tích hợp AI tư vấn, được xây dựng với React 19 & Node.js.
 
@@ -27,7 +27,7 @@
 
 ## 🌟 Giới Thiệu
 
-**Huyền Cơ Bát Tự** là nền tảng phân tích mệnh lý Tứ Trụ (Bát Tự / BaZi) toàn diện, kết hợp thuật toán tính toán truyền thống với trí tuệ nhân tạo (AI) để cung cấp luận giải chuyên sâu. Hệ thống hỗ trợ đầy đủ lịch Âm - Dương, chuyển đổi Can Chi, và phân tích Ngũ Hành theo mệnh lý học Đông phương.
+**Viet Lac So** là nền tảng phân tích mệnh lý Tứ Trụ (Bát Tự / BaZi) toàn diện, kết hợp thuật toán tính toán truyền thống với trí tuệ nhân tạo (AI) để cung cấp luận giải chuyên sâu. Hệ thống hỗ trợ đầy đủ lịch Âm - Dương, chuyển đổi Can Chi, và phân tích Ngũ Hành theo mệnh lý học Đông phương.
 
 ---
 
@@ -478,6 +478,6 @@ MIT License — Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 ---
 
 <p align="center">
-  <b>🏮 Huyền Cơ Bát Tự</b> — Nền tảng mệnh lý học hiện đại<br/>
-  <i>huyencobattu.com</i>
+  <b>🏮 Viet Lac So</b> — Nền tảng mệnh lý học hiện đại<br/>
+  <i>vietlac.com</i>
 </p>
