@@ -14,7 +14,7 @@
         "mệnh lý",
         "astrology"
     ],
-    "author": "Huyen Co Bat Tu",
+    "author": "Viet Lac So",
     "license": "MIT",
     "dependencies": {
         "compression": "^1.8.1",
