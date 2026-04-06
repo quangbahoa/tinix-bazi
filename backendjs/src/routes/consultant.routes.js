@@ -409,7 +409,7 @@ router.post('/comprehensive', authRoutes.authMiddleware, aiLimiter, async (req, 
         }
 
         // Build comprehensive prompt from chart data
-        const personaName = persona === 'menh_meo' ? 'Thầy Mệnh Mèo GenZ' : 'Thầy Huyền Cơ Bát Tự';
+        const personaName = persona === 'menh_meo' ? 'Thầy Mệnh Mèo GenZ' : 'Thầy Viet Lac So';
         const personaStyle = persona === 'menh_meo'
             ? `Hãy dùng ngôn ngữ Gen Z, hài hước, vui vẻ, NHIỀU EMOJI trong mỗi đoạn văn. 
 - Gọi người hỏi là "con", "bồ", hoặc "cưng"

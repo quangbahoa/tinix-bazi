@@ -259,7 +259,7 @@ class DatabaseService {
                 content TEXT NOT NULL,
                 thumbnail TEXT,
                 category_id INTEGER,
-                author TEXT DEFAULT 'Huyền Cơ Bát Tự',
+                author TEXT DEFAULT 'Viet Lac So',
                 views INTEGER DEFAULT 0,
                 is_published INTEGER DEFAULT 1,
                 is_featured INTEGER DEFAULT 0,
@@ -1160,7 +1160,7 @@ class DatabaseService {
             data.content,
             data.thumbnail || '',
             data.category_id || null,
-            data.author || 'Huyền Cơ Bát Tự',
+            data.author || 'Viet Lac So',
             data.is_published !== undefined ? (data.is_published ? 1 : 0) : 1,
             data.is_featured ? 1 : 0
         ]);

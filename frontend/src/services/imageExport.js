@@ -278,7 +278,7 @@ const createHTMLContent = (data) => {
 
         <!-- Footer -->
         <div style="background: rgba(0,0,0,0.3); padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1);">
-            <div style="font-size: 10px; color: #666;">Lá số lập tại <span style="color: #D4AF37; font-weight: 600;">huyencobattu.com</span></div>
+            <div style="font-size: 10px; color: #666;">Lá số lập tại <span style="color: #D4AF37; font-weight: 600;">vietlac.com</span></div>
             <div style="display: flex; gap: 12px; font-size: 10px;">
                 <span><span style="color: #78909C;">●</span> Kim</span>
                 <span><span style="color: #43A047;">●</span> Mộc</span>

@@ -74,7 +74,7 @@ const ComprehensiveInterpretation = ({ data }) => {
     const personas = [
         {
             id: 'huyen_co',
-            name: 'Thầy Huyền Cơ Bát Tự',
+            name: 'Thầy Viet Lac So',
             icon: '🧙‍♂️',
             desc: 'Phong cách cổ kính, uyên thâm, đầy chiêm nghiệm Đông phương.',
             style: 'Trang trọng, dẫn dắt từ triết lý, trích dẫn kinh điển.'

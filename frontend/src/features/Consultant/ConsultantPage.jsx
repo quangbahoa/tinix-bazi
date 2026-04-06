@@ -303,7 +303,7 @@ const ConsultantPage = ({ userData }) => {
     const personas = [
         {
             id: 'huyen_co',
-            name: 'Thầy Huyền Cơ Bát Tự',
+            name: 'Thầy Viet Lac So',
             icon: '🧙‍♂️',
             title: 'Bậc Thầy Bát Tự',
             desc: '35 năm kinh nghiệm, nhân văn, uyên bác.'
@@ -421,7 +421,7 @@ const ConsultantPage = ({ userData }) => {
             {step === 1 && (
                 <div className="consult-welcome-intro fade-in">
                     <h2 className="mystical-welcome-text">
-                        Hãy chọn câu hỏi về cuộc đời, Huyền cơ Bát tự sẽ giúp bạn giải đáp mọi thứ.
+                        Hãy chọn câu hỏi về cuộc đời, Viet Lac So sẽ giúp bạn giải đáp mọi thứ.
                     </h2>
                 </div>
             )}

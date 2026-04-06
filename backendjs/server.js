@@ -51,7 +51,7 @@ app.use(express.json({ limit: '5mb' })); // Increased limit for large chart data
 app.use(generalLimiter); // Apply general rate limit to all routes
 
 // Trust proxy for real IP behind Nginx/Cloudflare
-app.set('trust proxy', true);
+app.set('trust proxy', false);
 
 
 // Access logging middleware

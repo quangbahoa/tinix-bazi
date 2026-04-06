@@ -1087,7 +1087,7 @@ const AdminPage = () => {
             <aside className="admin-sidebar">
                 <div className="sidebar-header">
                     <h1>⚙️ ADMIN</h1>
-                    <span className="subtitle">Huyền Cơ Bát Tự</span>
+                    <span className="subtitle">Viet Lac So</span>
                 </div>
                 <nav className="sidebar-nav">
                     <Link to="/admin" className={path === '/admin' ? 'active' : ''}>

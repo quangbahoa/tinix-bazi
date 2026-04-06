@@ -44,7 +44,7 @@ const SampleShowcase = () => {
             <div className="sample-header">
                 <h3 className="sample-title">
                     <span className="sample-icon">🏮</span>
-                    Huyền cơ Bát tự - luận giải mọi thứ cuộc đời
+                    Viet Lac So - luận giải mọi thứ cuộc đời
                 </h3>
                 <button
                     className="sample-next-btn"
@@ -73,7 +73,7 @@ const SampleShowcase = () => {
                 <div className="sample-answer-box">
                     <div className="sample-answer-header">
                         <span className="master-avatar">🧙‍♂️</span>
-                        <span className="master-name">Thầy Huyền Cơ Bát Tự</span>
+                        <span className="master-name">Thầy Viet Lac So</span>
                     </div>
                     <p className="sample-answer">{currentSample.answer}</p>
                 </div>

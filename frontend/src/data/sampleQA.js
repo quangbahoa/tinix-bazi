@@ -1,5 +1,5 @@
 /**
- * Kho câu hỏi và luận giải mẫu của Thầy Huyền Cơ Bát Tự
+ * Kho câu hỏi và luận giải mẫu của Thầy Viet Lac So
  * Hiển thị ngẫu nhiên trên trang chủ
  */
 

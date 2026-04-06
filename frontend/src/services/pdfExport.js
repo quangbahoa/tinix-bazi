@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const WATERMARK = 'huyencobattu.com';
+const WATERMARK = 'vietlac.com';
 
 /**
  * Create SVG Radar Chart
@@ -189,7 +189,7 @@ const createPDFContent = (data, options) => {
     // Header
     html += `
         <div class="header">
-            <div><div class="title">HUYỀN CƠ BÁT TỰ</div><div class="subtitle">Tứ Trụ Mệnh Lý</div></div>
+            <div><div class="title">VIET LAC SO</div><div class="subtitle">Tứ Trụ Mệnh Lý</div></div>
             <div class="info">${info.ngay_duong_lich || ''} | ${new Date().toLocaleDateString('vi-VN')}</div>
         </div>
     `;
@@ -610,7 +610,7 @@ export const exportToPDF = async (data, options = {}) => {
         }
 
         const name = (data?.thong_tin_co_ban?.ten || 'LaSo').replace(/[^a-zA-Z0-9]/g, '') || 'LaSo';
-        doc.save(`HuyenCoBatTu_${name}_${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.save(`VietLacSo_${name}_${new Date().toISOString().split('T')[0]}.pdf`);
 
         return true;
     } catch (error) {
