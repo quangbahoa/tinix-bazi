@@ -1,4 +1,4 @@
-# 🏮 Huyền Cơ Bát Tự — BaZi Analysis Platform
+# 🏮 Viet Lac So — BaZi Analysis Platform
 
 > A comprehensive Four Pillars of Destiny (BaZi / 八字) analysis platform with AI-powered consultation, built with React 19 & Node.js.
 
@@ -27,7 +27,7 @@
 
 ## 🌟 Introduction
 
-**Huyền Cơ Bát Tự** is a full-featured Chinese metaphysics platform for Four Pillars of Destiny (BaZi / 八字) analysis. It combines traditional calculation algorithms with artificial intelligence (AI) to deliver in-depth life readings. The system supports both Solar and Lunar calendars, Heavenly Stems & Earthly Branches conversion, and Five Elements analysis following Eastern astrology principles.
+**Viet Lac So** is a full-featured Chinese metaphysics platform for Four Pillars of Destiny (BaZi / 八字) analysis. It combines traditional calculation algorithms with artificial intelligence (AI) to deliver in-depth life readings. The system supports both Solar and Lunar calendars, Heavenly Stems & Earthly Branches conversion, and Five Elements analysis following Eastern astrology principles.
 
 ---
 
@@ -478,6 +478,6 @@ MIT License — See [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <b>🏮 Huyền Cơ Bát Tự</b> — Modern Chinese Metaphysics Platform<br/>
-  <i>huyencobattu.com</i>
+  <b>🏮 Viet Lac So</b> — Modern Chinese Metaphysics Platform<br/>
+  <i>vietlac.com</i>
 </p>
