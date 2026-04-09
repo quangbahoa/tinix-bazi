@@ -1,5 +1,5 @@
 /**
- * Kho câu hỏi và luận giải mẫu của Thầy Viet Lac So
+ * Kho câu hỏi và luận giải mẫu của Thầy Quảng
  * Hiển thị ngẫu nhiên trên trang chủ
  */
 

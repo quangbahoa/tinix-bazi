@@ -112,10 +112,17 @@ class DatabaseService {
                 minute INTEGER DEFAULT 0,
                 gender TEXT DEFAULT 'Nam',
                 calendar TEXT DEFAULT 'solar',
+                time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        const customerTableInfo = await this.all(`PRAGMA table_info(customers)`);
+        const customerColumns = customerTableInfo.map(c => c.name);
+        if (!customerColumns.includes('time_zone')) {
+            console.log('[DB] Migrating customers: adding time_zone');
+            await this.run(`ALTER TABLE customers ADD COLUMN time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh'`);
+        }
 
         // Consultations table - Expanded with detailed context
         await this.run(`
@@ -472,7 +479,7 @@ class DatabaseService {
      * Find or create a customer based on birth info
      */
     async findOrCreateCustomer(userData) {
-        const { name, year, month, day, hour, minute, gender, calendar } = userData;
+        const { name, year, month, day, hour, minute, gender, calendar, timeZone } = userData;
 
         const existing = await this.get(`
             SELECT id FROM customers 
@@ -489,9 +496,9 @@ class DatabaseService {
 
         const safeName = name || 'Mệnh chủ';
         const result = await this.run(`
-            INSERT INTO customers (name, year, month, day, hour, minute, gender, calendar)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `, [safeName, year, month, day, hour || 12, minute || 0, gender || 'Nam', calendar || 'solar']);
+            INSERT INTO customers (name, year, month, day, hour, minute, gender, calendar, time_zone)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [safeName, year, month, day, hour || 12, minute || 0, gender || 'Nam', calendar || 'solar', timeZone || 'Asia/Ho_Chi_Minh']);
 
         console.log(`[DB] Customer #${result.id} created`);
         return result.id;
@@ -501,13 +508,13 @@ class DatabaseService {
      * Always create a new customer record
      */
     async createNewCustomer(userData) {
-        const { name, year, month, day, hour, minute, gender, calendar } = userData;
+        const { name, year, month, day, hour, minute, gender, calendar, timeZone } = userData;
         const safeName = name || 'Mệnh chủ';
 
         const result = await this.run(`
-            INSERT INTO customers (name, year, month, day, hour, minute, gender, calendar)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `, [safeName, year, month, day, hour || 12, minute || 0, gender || 'Nam', calendar || 'solar']);
+            INSERT INTO customers (name, year, month, day, hour, minute, gender, calendar, time_zone)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [safeName, year, month, day, hour || 12, minute || 0, gender || 'Nam', calendar || 'solar', timeZone || 'Asia/Ho_Chi_Minh']);
 
         return result.id;
     }

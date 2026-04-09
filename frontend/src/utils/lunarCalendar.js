@@ -3,6 +3,8 @@
  * Simplified lunar calendar calculation for display purposes
  * Based on Vietnamese lunar calendar algorithm
  */
+import { DateTime } from 'luxon';
+import { normalizeTimeZone, DEFAULT_TIME_ZONE } from './timezoneUtils';
 
 // Lunar month data encoded for years 1900-2100
 // Each year's data contains info about lunar months and leap months
@@ -75,16 +77,17 @@ function getLunarMonthDays(year, month) {
  * @param {number} solarDay 
  * @returns {Object} { year, month, day, isLeapMonth }
  */
-export function solarToLunar(solarYear, solarMonth, solarDay) {
+export function solarToLunar(solarYear, solarMonth, solarDay, timeZone = DEFAULT_TIME_ZONE) {
     // Validate input
     if (solarYear < 1900 || solarYear > 2100) {
         return { year: solarYear, month: solarMonth, day: solarDay, isLeapMonth: false };
     }
 
-    // Days from 1900-01-31 (lunar 1900-01-01)
-    const baseDate = new Date(1900, 0, 31);
-    const targetDate = new Date(solarYear, solarMonth - 1, solarDay);
-    let offset = Math.floor((targetDate - baseDate) / 86400000);
+    // Days from 1900-01-31 (lunar 1900-01-01), interpreted in selected timezone
+    const zone = normalizeTimeZone(timeZone);
+    const baseDate = DateTime.fromObject({ year: 1900, month: 1, day: 31 }, { zone }).startOf('day');
+    const targetDate = DateTime.fromObject({ year: solarYear, month: solarMonth, day: solarDay }, { zone }).startOf('day');
+    let offset = Math.floor(targetDate.diff(baseDate, 'days').days);
 
     if (offset < 0) {
         return { year: solarYear, month: solarMonth, day: solarDay, isLeapMonth: false };

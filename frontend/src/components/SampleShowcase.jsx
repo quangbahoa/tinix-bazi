@@ -73,7 +73,7 @@ const SampleShowcase = () => {
                 <div className="sample-answer-box">
                     <div className="sample-answer-header">
                         <span className="master-avatar">🧙‍♂️</span>
-                        <span className="master-name">Thầy Viet Lac So</span>
+                        <span className="master-name">Thầy Quảng</span>
                     </div>
                     <p className="sample-answer">{currentSample.answer}</p>
                 </div>

@@ -13,8 +13,9 @@ class BaZiService {
      * Full BaZi Analysis
      */
     async analyzeComplete(params) {
+        const { timeZone, ...cacheableParams } = params;
         return cacheService.getOrSet(
-            cacheService.generateKey({ method: 'analyzeComplete', ...params }),
+            cacheService.generateKey({ method: 'analyzeComplete', ...cacheableParams }),
             async () => {
                 const { year, month, day, hour, minute, gender, calendar, name } = params;
 
