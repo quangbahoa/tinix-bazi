@@ -324,19 +324,24 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
 
             <div className="modular-form-section">
                 <div className="modular-form-toolbar">
-                    <button
-                        type="button"
-                        className="premium-button small-btn modular-form-clear-btn"
-                        onClick={handleDoiLaSo}
-                        disabled={!isAuthenticated}
-                        title={
-                            isAuthenticated
-                                ? 'Xóa form và gỡ lá số đang lưu để nhập case mới'
-                                : 'Đăng nhập để đổi lá số (xóa form và gỡ lá số đã lưu)'
-                        }
-                    >
-                        Đổi Lá Số
-                    </button>
+                    <div className="modular-form-toolbar-left">
+                        <h3 className="modular-form-toolbar-heading">Xin Lá Số</h3>
+                    </div>
+                    <div className="modular-form-toolbar-right">
+                        <button
+                            type="button"
+                            className="premium-button small-btn modular-form-clear-btn"
+                            onClick={handleDoiLaSo}
+                            disabled={!isAuthenticated}
+                            title={
+                                isAuthenticated
+                                    ? 'Xóa form và gỡ lá số đang lưu để nhập case mới'
+                                    : 'Đăng nhập để đổi lá số (xóa form và gỡ lá số đã lưu)'
+                            }
+                        >
+                            Đổi Lá Số
+                        </button>
+                    </div>
                 </div>
                 <form onSubmit={handleSubmit} className="modular-form glass-card" style={{ position: 'relative' }}>
                 {!isAuthenticated && (

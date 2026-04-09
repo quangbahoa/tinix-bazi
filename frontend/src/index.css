@@ -1057,9 +1057,26 @@ select option,
 
 .modular-form-toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 0.65rem;
+}
+
+.modular-form-toolbar-left,
+.modular-form-toolbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.modular-form-toolbar-right {
+  justify-content: flex-end;
+}
+
+.modular-form-toolbar-heading {
+  margin: 0;
+  font-size: 1.06rem;
+  letter-spacing: 0.4px;
+  color: var(--text-primary);
 }
 
 .modular-form-clear-btn {
@@ -9490,6 +9507,25 @@ a.category-card {
 
 .bonus-icon {
   font-size: 1.5rem;
+}
+
+.guest-login-page {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.guest-login-wrap {
+  width: 100%;
+  max-width: 460px;
+  z-index: 2;
+}
+
+.guest-login-card {
+  width: 100%;
 }
 
 /* Credit Display */

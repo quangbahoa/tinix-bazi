@@ -23,9 +23,10 @@ import ImageExportButton from './components/ImageExportButton';
 import ComprehensiveInterpretation from './components/ComprehensiveInterpretation';
 import MobileShell from './components/MobileShell';
 import DesktopShell from './components/DesktopShell';
+import GuestLoginPage from './components/GuestLoginPage';
 import useWindowSize from './hooks/useWindowSize';
 import { useBaziApi } from './hooks/useBaziApi';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Input Page Component
 const InputPage = ({ onAnalyze, loading, onClearChart }) => {
@@ -91,7 +92,7 @@ const AppContent = () => {
   const { data, inputParams, loading, error, analyze, clearData } = useBaziApi();
   const { isMobile } = useWindowSize();
   const location = useLocation();
-  const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   // If we have data and we're on home page, redirect to chart preserving params
   // But skip if there's a pending question from suggestions
@@ -127,6 +128,15 @@ const AppContent = () => {
 
   const Shell = isMobile ? MobileShell : DesktopShell;
 
+  if (!authLoading && !isAuthenticated && (location.pathname === '/' || location.pathname === '/guest')) {
+    return (
+      <HelmetProvider>
+        <SEO title="Đăng nhập" url={location.pathname} />
+        <GuestLoginPage />
+      </HelmetProvider>
+    );
+  }
+
   // Admin page renders standalone without Shell
   if (location.pathname.startsWith('/admin')) {
     return (
@@ -148,7 +158,22 @@ const AppContent = () => {
 
         <Routes>
           {/* Input form routes */}
-          <Route path="/" element={<InputPage onAnalyze={analyze} loading={loading} onClearChart={clearData} />} />
+          <Route
+            path="/"
+            element={
+              isAuthenticated
+                ? <InputPage onAnalyze={analyze} loading={loading} onClearChart={clearData} />
+                : <Navigate to="/guest" replace />
+            }
+          />
+          <Route
+            path="/guest"
+            element={
+              isAuthenticated
+                ? <Navigate to="/" replace />
+                : <GuestLoginPage />
+            }
+          />
           <Route path="/input" element={<Navigate to="/" replace />} />
 
           {/* Chart page */}
