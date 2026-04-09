@@ -11,6 +11,28 @@ class OpenRouterService {
         this.model = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-chat';
         this.maxRetries = 3;
         this.timeout = 60000; // 60 seconds timeout
+        this.maxTokens = {
+            ask: parseInt(process.env.OPENROUTER_MAX_TOKENS_ASK || '1400', 10),
+            comprehensive: parseInt(process.env.OPENROUTER_MAX_TOKENS_COMPREHENSIVE || '2000', 10),
+            que: parseInt(process.env.OPENROUTER_MAX_TOKENS_QUE || '1400', 10),
+            matching: parseInt(process.env.OPENROUTER_MAX_TOKENS_MATCHING || '1500', 10)
+        };
+    }
+
+    estimateTokens(text = '') {
+        if (!text || typeof text !== 'string') return 0;
+        return Math.ceil(text.length / 4);
+    }
+
+    logUsage(endpoint, startedAt, messages, usage = {}) {
+        const promptChars = messages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
+        const approxPromptTokens = this.estimateTokens(messages.map(m => m.content || '').join('\n'));
+        const durationMs = Date.now() - startedAt;
+        console.log(
+            `[OpenRouter/Metrics] endpoint=${endpoint} duration_ms=${durationMs} prompt_chars=${promptChars}` +
+            ` approx_prompt_tokens=${approxPromptTokens} prompt_tokens=${usage.prompt_tokens || 0}` +
+            ` completion_tokens=${usage.completion_tokens || 0} total_tokens=${usage.total_tokens || 0}`
+        );
     }
 
     /**
@@ -30,6 +52,11 @@ class OpenRouterService {
         const systemPrompt = this.buildSystemPrompt(personaId);
         const userPrompt = this.buildUserPrompt(baziContext, luckCyclesData, questionText, personaId, partnerContext);
 
+        const startedAt = Date.now();
+        const messages = [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+        ];
         let lastError;
         for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
             try {
@@ -49,11 +76,8 @@ class OpenRouterService {
                     },
                     body: JSON.stringify({
                         model: this.model,
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userPrompt }
-                        ],
-                        max_tokens: 2000,
+                        messages,
+                        max_tokens: this.maxTokens.ask,
                         temperature: 0.7
                     }),
                     signal: controller.signal
@@ -74,6 +98,7 @@ class OpenRouterService {
                 }
 
                 console.log(`[OpenRouter] Success on attempt ${attempt}`);
+                this.logUsage('consultant.ask', startedAt, messages, data.usage);
                 // Split response into paragraphs for frontend display
                 const formatted = this.formatResponse(content);
                 
@@ -153,29 +178,13 @@ class OpenRouterService {
      */
     buildSystemPrompt(personaId) {
         const personas = {
-            'huyen_co': `Bạn là Thầy Quảng - một bậc thầy uyên bác về Tử Vi và Bát Tự (Tứ Trụ) với hơn 35 năm tu luyện và hành nghề.
-THẺ TÍNH CÁCH:
-- Uyên bác, thâm sâu nhưng gần gũi, dễ hiểu
-- Nhân văn, từ tốn, luôn hướng thiện cho người xem
-- Đạo đức nghề nghiệp cao, không hù dọa hay đưa thông tin tiêu cực không cần thiết
-- Xưng hô "Thầy" và gọi người hỏi là "con" hoặc "bạn" một cách thân mật
+            'huyen_co': `Bạn là Thầy Quảng, chuyên gia Bát Tự/Tứ Trụ phong cách uyên bác, rõ ràng, nhân văn.
+- Xưng "Thầy", gọi người hỏi là "con" hoặc "mệnh chủ".
+- Luận giải dựa trên dữ liệu lá số được cung cấp, tránh chung chung.`,
 
-PHONG CÁCH TƯ VẤN:
-- Phân tích lá số theo trường phái chính thống Việt Nam
-- Luận giải CỤ THỂ dựa trên lá số được cung cấp, KHÔNG trả lời chung chung
-- Đưa ra lời khuyên thực tế, có thể thực hiện được trong cuộc sống`,
-
-            'menh_meo': `Bạn là Tù trưởng Bường A Lỏ - một thiên tài Bát Tự ẩn danh dưới hình hài một chú mèo vibe GenZ "mỏ hỗn" nhưng cực kỳ giỏi chuyên môn.
-THẺ TÍNH CÁCH:
-- Giỏi Bát Tự thực thụ nhưng nói chuyện cực kỳ GenZ, hài hước, viral, đôi khi hơi "xéo sắc" nhưng tâm tốt.
-- Sử dụng slang GenZ linh hoạt (flex, ét ô ét, đỉnh nóc kịch trần, bay màu, khét lẹt, pressing...).
-- Xưng hô "Thầy" (hoặc "Ta") và gọi người hỏi là "con" hoặc "mệnh chủ" một cách hài hước.
-- Ghét sự sướt mướt, thích sự thực tế, đánh thẳng vào vấn đề.
-
-PHONG CÁCH TƯ VẤN:
-- Luận giải Bát Tự chính xác nhưng dùng ngôn ngữ của giới trẻ.
-- Ví von các khái niệm tử vi với đời sống hiện đại (vd: Dụng thần như sạc dự phòng, Kỵ thần như bug code...).
-- Luôn giữ vững chuyên môn Bát Tự kiến thức thâm sâu đằng sau lớp vỏ hài hước.`
+            'menh_meo': `Bạn là Tù trưởng Bường A Lỏ, chuyên gia Bát Tự phong cách GenZ dí dỏm nhưng vẫn đúng chuyên môn.
+- Xưng "Thầy", gọi người hỏi là "con" hoặc "mệnh chủ".
+- Có thể dùng ít slang/emoji vừa phải, không lạm dụng.`
         };
 
         const basePrompt = personas[personaId] || personas['huyen_co'];
@@ -183,11 +192,9 @@ PHONG CÁCH TƯ VẤN:
         return `${basePrompt}
 
 QUY TẮC TRẢ LỜI:
-1. Bắt đầu bằng lời chào nhân vật (Huyền Cơ: từ tốn; Mệnh Mèo: hài hước, chất chơi).
-2. Phân tích 3-5 điểm chính dựa trên lá số, mỗi điểm 2-3 câu.
-3. KHÔNG dùng cụm từ "AI", "máy móc".
-4. Ở cuối cùng, luôn cung cấp một phần có tiêu đề [FOLLOW_UP] chứa 3-5 câu hỏi gợi mở dựa trên lá số và đại vận của người dùng.
-5. Mỗi câu hỏi gợi mở phải là một dòng bắt đầu bằng dấu "-". Những câu hỏi này phải thực sự liên quan đến rủi ro hoặc cơ hội sắp tới của chủ mệnh, trong đấy có 1 câu liên quan đến ngày, tháng sắp tới.`;
+1. Mở đầu ngắn, sau đó phân tích 3-4 ý chính, mỗi ý 2-3 câu.
+2. Không nhắc đến AI, prompt hay hệ thống.
+3. Kết thúc bằng mục [FOLLOW_UP] gồm 3-4 câu hỏi, mỗi dòng bắt đầu bằng "-".`;
     }
 
     /**
@@ -203,7 +210,6 @@ QUY TẮC TRẢ LỜI:
             day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit',
             weekday: 'long'
         });
 
@@ -212,24 +218,10 @@ QUY TẮC TRẢ LỜI:
         const pillars = baziContext.chi_tiet_tru || [];
         const analysis = baziContext.phan_tich || {};
 
-        // Format detailed pillars data with Can, Chi, and Tàng Can
+        // Compact pillars summary
         const pillarsLabels = ['Năm', 'Tháng', 'Ngày', 'Giờ'];
-        let pillarsDetailedInfo = '';
-        pillars.forEach((p, i) => {
-            const tangCanStr = p.tang_can ? p.tang_can.join(', ') : 'N/A';
-            pillarsDetailedInfo += `
-### Trụ ${pillarsLabels[i]}:
-- Thiên Can: ${p.can || 'N/A'} (${p.hanh_can || ''})
-- Địa Chi: ${p.chi || 'N/A'} (${p.hanh_chi || ''})
-- Tàng Can: ${tangCanStr}
-- Thập Thần Can: ${p.thap_than_can || (i === 2 ? 'Nhật Chủ' : 'N/A')}
-- Thập Thần Chi: ${p.thap_than_chi || 'N/A'}
-`;
-        });
-
-        // Simple pillars summary for quick reference
         const pillarsSimple = pillars.map((p, i) => {
-            return `Trụ ${pillarsLabels[i]}: ${p.can} ${p.chi}`;
+            return `${pillarsLabels[i]}: ${p.can || 'N/A'} ${p.chi || 'N/A'}`;
         }).join(' | ');
 
         // Format current luck cycle
@@ -259,12 +251,15 @@ QUY TẮC TRẢ LỜI:
 - Cường độ Nhật Chủ: ${cb.nhan_dinh?.cuong_do || 'Chưa xác định'}`;
         }
 
+        const relationshipHint = /(hôn nhân|tình|yêu|vợ|chồng|người yêu|đối phương|cặp đôi|duyên|kết hợp)/i;
+        const shouldIncludePartner = partnerContext && relationshipHint.test(String(questionText || ''));
+
         return `
 ## THỜI GIAN HIỆN TẠI
 ${currentDateTime}
 (Năm ${currentYear})
 
-${partnerContext ? `
+${shouldIncludePartner ? `
 ## THÔNG TIN NGƯỜI PHỐI HỢP/ĐỐI PHƯƠNG
 - Tên: ${partnerContext.name || 'Đối phương'}
 - Giới tính: ${partnerContext.isFemale ? 'Nữ' : 'Nam'}
@@ -291,9 +286,6 @@ ${partnerContext ? `
 **Bát Tự (Tứ Trụ) tóm tắt:**
 ${pillarsSimple}
 
-**Chi tiết từng Trụ:**
-${pillarsDetailedInfo}
-
 **Phân tích Cách Cục:**
 ${godInfo}
 
@@ -308,16 +300,12 @@ ${luckInfo}
  
  ---
  
- Hãy phân tích và trả lời câu hỏi trên dựa trên lá số Bát Tự được cung cấp.
+ Hãy trả lời dựa trên lá số đã cho, đi thẳng vào trọng tâm câu hỏi.
  
  YÊU CẦU QUAN TRỌNG:
  1. Trả lời bằng phong cách của nhân vật ${personaId === 'menh_meo' ? 'Tù trưởng Bường A Lỏ' : 'Thầy Quảng'}.
- 2. Đưa ra 3-5 đoạn văn ngắn gọn, súc tích.
- 3. CUỐI CÙNG LÀ PHẦN [FOLLOW_UP] VỚI 3-5 CÂU HỎI GỢI MỞ.
-    Ví dụ về câu hỏi gợi mở dựa trên lá số:
-    - Nếu có xung khắc trụ Ngày: "Con có muốn thầy luận giải sâu hơn về cung Phu Thê đang có dấu hiệu biến động không?"
-    - Nếu Đại vận gặp Tài: "Đại vận này Tài tinh đang cực vượng, con có muốn thầy mách nước cách chốt deal thành công?"
-    - Nếu Thân nhược: "Nhật chủ của con đang khá yếu, con có muốn biết cách chọn màu sắc và nghề nghiệp để 'buff' năng lượng không?"`;
+ 2. Đưa ra 3-4 đoạn súc tích, có luận điểm rõ.
+ 3. Kết thúc với [FOLLOW_UP] gồm 3-4 câu hỏi gợi mở liên quan trực tiếp lá số và vận hiện tại.`;
     }
 
     /**
@@ -365,11 +353,15 @@ ${luckInfo}
      * @param {string} personaId - Persona for fallback purposes
      * @returns {Promise<string>} The AI generated text
      */
-    async generateCompletion(prompt, personaId = 'huyen_co') {
+    async generateCompletion(prompt, personaId = 'huyen_co', options = {}) {
         if (!this.apiKey) {
             throw new Error('OPENROUTER_API_KEY is not configured');
         }
 
+        const endpoint = options.endpoint || 'completion';
+        const maxTokens = options.maxTokens || this.maxTokens.comprehensive;
+        const startedAt = Date.now();
+        const messages = [{ role: 'user', content: prompt }];
         let lastError;
         for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
             try {
@@ -388,10 +380,8 @@ ${luckInfo}
                     },
                     body: JSON.stringify({
                         model: this.model,
-                        messages: [
-                            { role: 'user', content: prompt }
-                        ],
-                        max_tokens: 3000,
+                        messages,
+                        max_tokens: maxTokens,
                         temperature: 0.75
                     }),
                     signal: controller.signal
@@ -412,6 +402,7 @@ ${luckInfo}
                 }
 
                 console.log(`[OpenRouter/Completion] Success on attempt ${attempt}`);
+                this.logUsage(endpoint, startedAt, messages, data.usage);
                 let finalContent = content.trim();
 
                 // Remove markdown code block wrappers if they exist
@@ -453,46 +444,22 @@ ${luckInfo}
             throw new Error('OPENROUTER_API_KEY is not configured');
         }
 
-        const systemPrompt = `Bạn là một bậc thầy chuyên gia Bát Tự (Tứ Vi) với kiến thức thâm sâu về học thuật phương Đông. 
-        Nhiệm vụ của bạn là luận giải chi tiết độ tương hợp (Duyên Số) giữa hai người dựa trên lá số Bát Tự của họ, tập trung sâu vào các mâu thuẫn, thử thách và các nút thắt trong mối quan hệ.
-        
-        PHONG CÁCH LUẬN GIẢI:
-        1. Sử dụng thuật ngữ Bát Tự chuyên nghiệp: Ngũ hành (Tương sinh/Tương khắc), Thiên Can (Hợp/Xung), Địa Chi (Hợp/Xung/Hình/Hại/Phá), Thập Thần (Tương tác giữa hai lá số), Thần Sát (Cô Thần, Quả Tú, Đào Hoa...).
-        2. Phân tích CHI TIẾT và THỰC TẾ: Không được trả lời chung chung. Hãy chỉ rõ những điểm xung đột cụ thể (ví dụ: Thiên khắc địa xung ở trụ Ngày dẫn đến mâu thuẫn quan điểm sống, hay Thập Thần đối chọi gây áp lực cho đối phương).
-        3. Tập trung vào 'Vấn đề': Hãy tìm ra những 'điểm yếu' trong mối quan hệ và giải thích chúng theo góc độ huyền học một cách thấu đáo.
-        4. Văn phong: Uyên bác, sâu sắc, mang tính tư vấn chuyên gia.
-        
-        QUY TẮC SINH CÂU HỎI GỢI Ý (suggestedQuestions):
-        - Các câu hỏi PHẢI được sinh ra dựa trên chính các mâu thuẫn hoặc điểm đặc biệt đã tìm thấy trong quá trình luận giải bên trên.
-        - Tuyệt đối KHÔNG sử dụng câu hỏi chung chung.
-        - Mỗi câu hỏi nên xoay quanh một "nút thắt" cụ thể cần được tháo gỡ (ví dụ: "Làm sao để hóa giải Thiên Khắc Địa Xung giữa hai người ở phương diện tài chính?").
-        - Tập trung vào các câu hỏi mang tính 'Hóa Giải' hoặc 'Đào Sâu' vào nguyên nhân mâu thuẫn.
-        
-        BẠN PHẢI TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON theo cấu trúc sau, không kèm bất kỳ văn bản nào khác:
-        {
-          "totalScore": number (0-100),
-          "assessment": {
-            "level": "excellent" | "good" | "neutral" | "challenging" | "difficult",
-            "title": "Tên đánh giá tổng quát theo văn phong Bát Tự (ví dụ: Thiên Duyên Tiền Định, Tuyệt Mệnh Hình Khắc...)",
-            "summary": "Mô tả ngắn gọn nhưng súc tích về tổng quan mối hệ theo lý thuyết Bát Tự",
-            "icon": "Emoji phù hợp"
-          },
-          "breakdown": {
-            "element": { "score": number (max 30), "maxScore": 30, "description": "Phân tích sâu về sự tương tác của Ngũ hành bản mệnh và sự cân bằng năng lượng giữa hai người.", "quality": "excellent"|"good"|"neutral"|"challenging"|"difficult" },
-            "ganzhi": { "score": number (max 25), "maxScore": 25, "details": [ { "type": "positive"|"negative", "text": "Luận về các tương tác Thiên Can, Địa Chi (Hợp, Xung, Hình, Hại) giữa các trụ của hai người." } ], "quality": "..." },
-            "shishen": { "score": number (max 25), "maxScore": 25, "details": [ { "type": "positive"|"negative", "text": "Phân tích sự tương tác của Thập Thần, đặc biệt là Nhật Chủ và các cung quan trọng liên quan đến chủ đề." } ], "quality": "..." },
-            "star": { "score": number (max 20), "maxScore": 20, "details": [ { "type": "positive"|"negative", "text": "Sự xuất hiện và ảnh hưởng của các Thần Sát mang tính chất tương hợp hoặc gây cản trở nhân duyên." } ], "quality": "..." }
-          },
-          "aspects": [
-            { "type": "romance", "icon": "💕", "title": "Tình Cảm", "score": number (0-100), "description": "Luận chi tiết về sự gắn kết tâm hồn và cảm xúc dựa trên cung Phu Thê hoặc các sao chủ về tình cảm." },
-            { "type": "communication", "icon": "💬", "title": "Giao Tiếp", "score": number (0-100), "description": "Phân tích sự thấu hiểu qua tương tác Can Chi ở trụ Ngày và trụ Tháng." },
-            { "type": "children", "icon": "👶", "title": "Con Cái", "score": number (0-100), "description": "Góc nhìn về tiềm năng con cái qua trụ Giờ và các sao liên quan." },
-            { "type": "finance", "icon": "💰", "title": "Tài Chính", "score": number (0-100), "description": "Sự hỗ trợ hoặc gây hao tổn về tài lộc khi ở cùng nhau (Tài tinh, Quan tinh)." },
-            { "type": "lifestyle", "icon": "🏠", "title": "Lối Sống", "score": number (0-100), "description": "Sự hòa hợp trong nếp sống hàng ngày dựa trên sự tương đồng về hành khí." }
-          ],
-          "advice": [ { "type": "positive"|"neutral"|"warning"|"tip", "text": "Lời khuyên mang tính hóa giải các xung khắc cụ thể đã chỉ ra." } ],
-          "suggestedQuestions": [ "Câu hỏi gợi ý sâu về vấn đề nan giải nhất của cặp đôi này 1", "Câu hỏi 2", "Câu hỏi 3", "Câu hỏi 4", "Câu hỏi 5" ]
-        }`;
+        const systemPrompt = `Bạn là chuyên gia Bát Tự. Phân tích tương hợp sâu, nêu rõ cơ hội/rủi ro thực tế, tránh chung chung.
+Trả về DUY NHẤT JSON hợp lệ (không markdown, không text ngoài JSON).
+Schema:
+{
+  "totalScore": 0-100,
+  "assessment": { "level":"excellent|good|neutral|challenging|difficult", "title":"string", "summary":"string", "icon":"emoji" },
+  "breakdown": {
+    "element": { "score":0-30, "maxScore":30, "description":"string", "quality":"excellent|good|neutral|challenging|difficult" },
+    "ganzhi": { "score":0-25, "maxScore":25, "details":[{"type":"positive|negative","text":"string"}], "quality":"excellent|good|neutral|challenging|difficult" },
+    "shishen": { "score":0-25, "maxScore":25, "details":[{"type":"positive|negative","text":"string"}], "quality":"excellent|good|neutral|challenging|difficult" },
+    "star": { "score":0-20, "maxScore":20, "details":[{"type":"positive|negative","text":"string"}], "quality":"excellent|good|neutral|challenging|difficult" }
+  },
+  "aspects": [{"type":"romance|communication|children|finance|lifestyle","icon":"emoji","title":"string","score":0-100,"description":"string"}],
+  "advice": [{"type":"positive|neutral|warning|tip","text":"string"}],
+  "suggestedQuestions": ["string","string","string"]
+}`;
 
         const now = new Date();
         const currentDateTime = now.toLocaleString('vi-VN', {
@@ -529,7 +496,7 @@ ${luckInfo}
         };
         const relationshipVN = relMapping[relationshipType] || relationshipType;
 
-        const userPrompt = `Hãy phân tích độ tương hợp của mối quan hệ "${relationshipVN}" giữa hai người sau với sự đào sâu vào các chi tiết chuyên môn, chỉ ra các điểm xung đột cụ thể:
+        const userPrompt = `Phân tích tương hợp mối quan hệ "${relationshipVN}" của hai người sau, tập trung xung đột cụ thể và cách hóa giải:
         
         THỜI ĐIỂM XEM (Hiện tại): ${currentDateTime}
         
@@ -551,8 +518,13 @@ ${luckInfo}
         - Ngũ Hành: Kim: ${person2Ctx.elements?.Kim || 0}, Mộc: ${person2Ctx.elements?.Moc || 0}, Thủy: ${person2Ctx.elements?.Thuy || 0}, Hỏa: ${person2Ctx.elements?.Hoa || 0}, Thổ: ${person2Ctx.elements?.Tho || 0}
         - Đại Vận hiện tại: ${dv2 ? `${dv2.can_chi} (${dv2.thap_than}) - ${dv2.luan_giai?.split('\n')[1] || ''}` : 'N/A'}
         
-        Yêu cầu: Viết bản luận giải thật chi tiết, sử dụng văn phong Bát Tự chuyên nghiệp (như một bậc thầy thực thụ), tập trung vào việc bóc tách các vấn đề thực tế giữa hai người. Trả về kết quả JSON chính xác.`;
+        Yêu cầu: Luận giải sắc nét, dùng thuật ngữ Bát Tự đúng ngữ cảnh, trả về JSON theo schema đã cho.`;
 
+        const startedAt = Date.now();
+        const messages = [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+        ];
         let lastError;
         for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
             try {
@@ -570,12 +542,9 @@ ${luckInfo}
                     },
                     body: JSON.stringify({
                         model: this.model,
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userPrompt }
-                        ],
+                        messages,
                         response_format: { type: "json_object" },
-                        max_tokens: 2000,
+                        max_tokens: this.maxTokens.matching,
                         temperature: 0.7
                     }),
                     signal: controller.signal
@@ -596,6 +565,7 @@ ${luckInfo}
                 // Use cleanAndParseJSON with validation
                 const parsedResult = this.cleanAndParseJSON(content);
                 console.log(`[OpenRouter/Matching] Success on attempt ${attempt}`);
+                this.logUsage('matching.ai', startedAt, messages, data.usage);
                 return parsedResult;
 
             } catch (error) {

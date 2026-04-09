@@ -19,6 +19,21 @@ const ComprehensiveInterpretation = ({ data }) => {
     const randomSuggestion = null; // server suggestions disabled; FAB uses interpret/consult rotation
     const [fabMode, setFabMode] = useState('interpret'); // 'interpret' or 'consult'
 
+    const buildChartDataLite = (chart) => {
+        if (!chart) return null;
+        return {
+            customerId: chart.customerId,
+            thong_tin_co_ban: chart.thong_tin_co_ban,
+            thong_tin: chart.thong_tin,
+            chi_tiet_tru: chart.chi_tiet_tru,
+            phan_tich: {
+                can_bang_ngu_hanh: chart.phan_tich?.can_bang_ngu_hanh || {}
+            },
+            dai_van: chart.dai_van,
+            diem_so: chart.diem_so
+        };
+    };
+
     // Toggle FAB mode for new users every 5 seconds
     useEffect(() => {
         const interval = setInterval(() => {
@@ -110,7 +125,7 @@ const ComprehensiveInterpretation = ({ data }) => {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    chartData: data,
+                    chartDataLite: buildChartDataLite(data),
                     persona: selectedPersona
                 })
             });

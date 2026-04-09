@@ -289,8 +289,8 @@ class QueService {
         const gender = baziContext.thong_tin_co_ban?.gioi_tinh || 'Nam';
         const lifeStage = baziContext.thong_tin_co_ban?.giai_doan_doi || 'Bình thường';
 
-        const prompt = `Bạn là bậc thầy ẩn sĩ "Huyền Cơ", chuyên gia tối cao về Kinh Dịch và Bát Tự. 
-Hãy thực hiện một bài LUẬN GIẢI CHI TIẾT quẻ ${periodLabel} ${topicLabel} cho mệnh chủ dựa trên sự tương tác giữa Mệnh (Lá số Bát Tự) và Thời (Năng lượng hiện tại).
+        const prompt = `Bạn là thầy Huyền Cơ, chuyên gia Kinh Dịch và Bát Tự.
+Luận giải quẻ ${periodLabel} ${topicLabel} dựa trên tương tác giữa Mệnh và Thời.
 
 ### THÔNG TIN ĐẦU VÀO:
 
@@ -313,7 +313,7 @@ Hãy thực hiện một bài LUẬN GIẢI CHI TIẾT quẻ ${periodLabel} ${to
 - Tính chất: ${guaResult.qualityScore >= 50 ? 'Cát/Trung' : 'Cần cẩn trọng/Hung'}
 - Quan hệ Can Chi: ${guaResult.interaction.ganInteraction.relation}
 
-### YÊU CẦU CẤU TRÚC BÀI LUẬN (TUÂN THỦ 100%):
+### CẤU TRÚC BÀI LUẬN:
 
 **I. Thông tin thời vận**
 - Phân tích Can Chi của ${periodLabel} tương ứng.
@@ -328,7 +328,7 @@ Hãy thực hiện một bài LUẬN GIẢI CHI TIẾT quẻ ${periodLabel} ${to
 - Luận giải SÂU SẮC và CHI TIẾT về chủ đề **${topic.toUpperCase()}** (Đây là trọng tâm chính):
   + Phân tích cơ hội và thách thức cụ thể trong ${periodLabel}.
   + Dự báo diễn biến.
-- Nếu chủ đề là "Chung", hãy luận giải 4 phương diện chính (Công việc, Tài chính, Tình cảm, Sức khỏe).
+- Nếu chủ đề là "Chung", luận giải ngắn theo 4 phương diện (Công việc, Tài chính, Tình cảm, Sức khỏe).
 - Lời khuyên hành động cốt lõi để đạt được kết quả tốt nhất về ${topic}.
 
 **IV. Cá nhân hóa Bát Tự**
@@ -336,16 +336,16 @@ Hãy thực hiện một bài LUẬN GIẢI CHI TIẾT quẻ ${periodLabel} ${to
 - Sự tương tác với Dụng thần (${dungThan.join('/')}) hoặc Kỵ thần (${kyThan.join('/')}).
 - Luận giải: ${type === 'daily' ? 'Việc NÊN LÀM/NÊN TRÁNH cụ thể trong ngày.' : type === 'monthly' ? 'Chiến lược hành động và tháng này là thuận hay cần tiết chế.' : 'Năm này là năm mở rộng hay thu mình, bài học lớn nhất của năm.'}
 
-### QUY TẮC VĂN PHONG:
-1. Viết liền mạch, uyên bác, trang trọng nhưng sâu sắc (phong cách Thầy Huyền Cơ).
-2. XƯNG HÔ PHÙ HỢP: Gọi người dùng là "con" hoặc "mệnh chủ". Có thể dùng "Quý ông/Quý bà" khi cần sự trang trọng tuyệt đối.
-3. TRÌNH BÀY THEO CHIỀU DỌC, không dùng tab/cột. Sử dụng tiêu đề Markdown clear.
-4. KHÔNG dùng chữ Hán gốc, luôn dùng tên gọi tiếng Việt (Giáp, Ất, Tý, Sửu...). 
-5. KHÔNG bao bọc trong code block (\`\`\`).
-6. Tuyệt đối KHÔNG nhắc đến AI, Máy tính, OpenRouter hay "luật lệ prompt".`;
+### QUY TẮC:
+1. Văn phong uyên bác, rõ ràng, gọi người dùng là "con" hoặc "mệnh chủ".
+2. Không dùng code block, không nhắc AI/hệ thống.
+3. Viết súc tích, đi thẳng vào luận điểm và hành động cụ thể.`;
 
         try {
-            const response = await openrouter.generateCompletion(prompt, 'huyen_co');
+            const response = await openrouter.generateCompletion(prompt, 'huyen_co', {
+                endpoint: 'que.analysis',
+                maxTokens: openrouter.maxTokens.que
+            });
             return response;
         } catch (e) {
             console.error('[LLM] Failed:', e.message);
