@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { solarToLunar } from '../../utils/lunarCalendar';
 
 const DatePicker = ({ value, onChange, onClose }) => {
@@ -139,7 +140,7 @@ const DatePicker = ({ value, onChange, onClose }) => {
             y === today.getFullYear();
     };
 
-    return (
+    return createPortal(
         <div className="date-picker-overlay">
             <div className="date-picker-container glass-card" ref={pickerRef}>
                 {/* Year Navigation */}
@@ -220,7 +221,8 @@ const DatePicker = ({ value, onChange, onClose }) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
