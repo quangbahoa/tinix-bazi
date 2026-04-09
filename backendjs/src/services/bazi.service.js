@@ -13,6 +13,7 @@ class BaZiService {
      * Full BaZi Analysis
      */
     async analyzeComplete(params) {
+        const { timeZone, ...cacheableParams } = params || {};
         const { timeZone, ...cacheableParams } = params;
         return cacheService.getOrSet(
             cacheService.generateKey({ method: 'analyzeComplete', ...cacheableParams }),

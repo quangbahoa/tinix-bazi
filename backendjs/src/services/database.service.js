@@ -58,7 +58,7 @@ class DatabaseService {
                     console.error(err);
                     reject(err);
                 } else {
-                    resolve({ id: this.lastID, changes: this.changes });
+                    resolve({ id: this.lastID, lastID: this.lastID, changes: this.changes });
                 }
             });
         });
@@ -97,6 +97,24 @@ class DatabaseService {
     }
 
     /**
+     * Close sqlite connection gracefully
+     */
+    close() {
+        return new Promise((resolve, reject) => {
+            if (!this.db) return resolve();
+            this.db.close((err) => {
+                if (err) {
+                    console.error('[DB] Error closing database:', err.message);
+                    return reject(err);
+                }
+                this.db = null;
+                console.log('[DB] Database connection closed.');
+                resolve();
+            });
+        });
+    }
+
+    /**
      * Create tables if they don't exist
      */
     async createTables() {
@@ -121,6 +139,13 @@ class DatabaseService {
         const customerColumns = customerTableInfo.map(c => c.name);
         if (!customerColumns.includes('time_zone')) {
             console.log('[DB] Migrating customers: adding time_zone');
+            await this.run(`ALTER TABLE customers ADD COLUMN time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh'`);
+        }
+
+        // customers.time_zone migration for old databases
+        const customerColumns = await this.all(`PRAGMA table_info(customers)`);
+        const hasTimeZoneColumn = customerColumns.some((col) => col.name === 'time_zone');
+        if (!hasTimeZoneColumn) {
             await this.run(`ALTER TABLE customers ADD COLUMN time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh'`);
         }
 
@@ -1214,7 +1239,7 @@ class DatabaseService {
             INSERT INTO article_categories (name, slug, description, order_index)
             VALUES (?, ?, ?, ?)
         `, [data.name, data.slug, data.description || '', data.order_index || 0]);
-        return result.lastID;
+        return result.id;
     }
 
     async getArticles(options = {}) {
@@ -1295,7 +1320,7 @@ class DatabaseService {
             data.is_published !== undefined ? (data.is_published ? 1 : 0) : 1,
             data.is_featured ? 1 : 0
         ]);
-        return result.lastID;
+        return result.id;
     }
 
     async updateArticle(id, data) {

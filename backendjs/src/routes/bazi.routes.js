@@ -4,6 +4,17 @@ const baziService = require('../services/bazi.service');
 const dbService = require('../services/database.service');
 const ganzhi = require('../bazi/ganzhi');
 const authRoutes = require('./auth.routes');
+const DEFAULT_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+
+function normalizeTimeZone(timeZone) {
+    if (!timeZone || typeof timeZone !== 'string') return DEFAULT_TIME_ZONE;
+    try {
+        Intl.DateTimeFormat(undefined, { timeZone });
+        return timeZone;
+    } catch {
+        return DEFAULT_TIME_ZONE;
+    }
+}
 
 const DEFAULT_TIME_ZONE = 'Asia/Ho_Chi_Minh';
 
@@ -45,6 +56,7 @@ router.use([
  */
 router.get('/analyze', async (req, res) => {
     try {
+        const { year, month, day, hour = 12, minute = 0, gender = 'Nam', calendar = 'solar', name = '', timeZone } = req.query;
         const { year, month, day, hour = 12, minute = 0, gender = 'Nam', calendar = 'solar', name = '', timeZone = DEFAULT_TIME_ZONE } = req.query;
         const normalizedTimeZone = normalizeTimeZone(timeZone);
 
@@ -52,10 +64,12 @@ router.get('/analyze', async (req, res) => {
             return res.status(400).json({ error: 'Missing required parameters: year, month, day' });
         }
 
+        const normalizedTimeZone = normalizeTimeZone(timeZone);
+
         // Save customer to database (every request = new customer)
         let customerId = null;
         try {
-            customerId = dbService.createNewCustomer({
+            customerId = await dbService.createNewCustomer({
                 name: name || 'Mệnh chủ',
                 year: parseInt(year),
                 month: parseInt(month),

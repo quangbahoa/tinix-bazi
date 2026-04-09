@@ -31,6 +31,8 @@ const parseTrustProxy = () => {
 
 const app = express();
 const PORT = process.env.PORT || 8888;
+let httpServer = null;
+let isShuttingDown = false;
 // Rate limiting (numeric limits from env via src/config/rateLimit.env.js)
 const generalLimiter = rateLimit({
     windowMs: rateLimitCfg.generalWindowMs,
@@ -181,27 +183,38 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
-// Graceful shutdown
-process.on('SIGINT', () => {
-    console.log('\n[SHUTDOWN] Closing database connection...');
-    dbService.close();
-    process.exit(0);
-});
+const shutdown = async (signal, { restart = false } = {}) => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    console.log(`\n[SHUTDOWN] Received ${signal}, closing server resources...`);
 
-process.on('SIGTERM', () => {
-    console.log('\n[SHUTDOWN] Closing database connection...');
-    dbService.close();
-    process.exit(0);
-});
+    if (httpServer) {
+        await new Promise((resolve) => {
+            httpServer.close((err) => {
+                if (err) {
+                    console.error('[SHUTDOWN] HTTP server close error:', err.message);
+                }
+                resolve();
+            });
+        });
+    }
 
-process.once('SIGUSR2', () => {
-    console.log('\n[RESTART] Closing database connection before nodemon restart...');
-    dbService.close();
-    // Allow a small delay for OS to sync file
-    setTimeout(() => {
+    try {
+        await dbService.close();
+    } catch (err) {
+        console.error('[SHUTDOWN] Database close error:', err.message);
+    }
+
+    if (restart) {
         process.kill(process.pid, 'SIGUSR2');
-    }, 100);
-});
+        return;
+    }
+    process.exit(0);
+};
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.once('SIGUSR2', () => shutdown('SIGUSR2', { restart: true }));
 
 // Initialize database and start server
 (async () => {
@@ -209,7 +222,7 @@ process.once('SIGUSR2', () => {
         await dbService.init();
         console.log('[STARTUP] Database initialized successfully.');
 
-        app.listen(PORT, () => {
+        httpServer = app.listen(PORT, () => {
             console.log(`🚀 VietLac BaZi API running on port ${PORT}`);
             if (serveSpa) console.log(`🌐 SPA static: ${staticDir}`);
             console.log(`📚 API Docs (local): http://localhost:${PORT}/api/docs`);

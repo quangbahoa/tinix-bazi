@@ -2,6 +2,30 @@ import ct from 'countries-and-timezones';
 
 export const DEFAULT_TIME_ZONE = 'Asia/Ho_Chi_Minh';
 
+const CONTINENT_LABELS = {
+    Asia: 'Châu Á',
+    Europe: 'Châu Âu',
+    America: 'Châu Mỹ',
+    Africa: 'Châu Phi',
+    Australia: 'Châu Đại Dương',
+    Pacific: 'Thái Bình Dương',
+    Atlantic: 'Đại Tây Dương',
+    Indian: 'Ấn Độ Dương',
+    Antarctica: 'Nam Cực'
+};
+
+const CONTINENT_ORDER = [
+    'Asia',
+    'Europe',
+    'America',
+    'Africa',
+    'Australia',
+    'Pacific',
+    'Atlantic',
+    'Indian',
+    'Antarctica'
+];
+
 export function isValidTimeZone(timeZone) {
     if (!timeZone || typeof timeZone !== 'string') return false;
     try {
@@ -68,6 +92,7 @@ export function buildTimeZoneOptions() {
     return options;
 }
 
+function getContinentFromTimeZone(timeZone) {
 const CONTINENT_LABELS = {
     Asia: 'Châu Á',
     Europe: 'Châu Âu',

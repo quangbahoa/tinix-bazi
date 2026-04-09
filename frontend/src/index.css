@@ -1118,6 +1118,56 @@ select option,
   grid-column: span 2;
 }
 
+.input-hint {
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.tz-react-select {
+  width: 100%;
+}
+
+.tz-select__control {
+  min-height: 44px !important;
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid rgba(226, 192, 68, 0.3) !important;
+  box-shadow: none !important;
+}
+
+.tz-select__control:hover,
+.tz-select__control--is-focused {
+  border-color: rgba(226, 192, 68, 0.62) !important;
+}
+
+.tz-select__single-value,
+.tz-select__input-container,
+.tz-select__placeholder {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.tz-select__menu {
+  background: rgba(12, 12, 16, 0.98) !important;
+  border: 1px solid rgba(226, 192, 68, 0.3);
+  z-index: 10060 !important;
+}
+
+.tz-select__group-heading,
+.tz-group-label {
+  color: var(--accent-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tz-select__option {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.tz-select__option--is-focused {
+  background: rgba(226, 192, 68, 0.18) !important;
+}
+
 .start-button {
   margin-top: 2rem;
   width: 100%;

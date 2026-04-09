@@ -257,19 +257,24 @@ router.post('/register', async (req, res) => {
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
     console.log('--- LOGIN REQUEST ---');
-    console.log('[AUTH] Login attempt for:', req.body?.email || 'unknown');
+    console.log('[AUTH] Login attempt for:', req.body?.identifier || req.body?.email || 'unknown');
     try {
-        const { email, password } = req.body;
+        const { identifier, email, password } = req.body;
+        const loginId = String(identifier || email || '').trim();
 
-        if (!email || !password) {
-            console.warn('[AUTH] Missing email or password');
-            return res.status(400).json({ error: 'Email và mật khẩu là bắt buộc' });
+        if (!loginId || !password) {
+            console.warn('[AUTH] Missing identifier or password');
+            return res.status(400).json({ error: 'Email/username và mật khẩu là bắt buộc' });
         }
 
-        const user = await dbService.getUserByEmail(email.toLowerCase().trim());
+        const normalizedLoginId = loginId.toLowerCase();
+        const isEmailLogin = normalizedLoginId.includes('@');
+        const user = isEmailLogin
+            ? await dbService.getUserByEmail(normalizedLoginId)
+            : await dbService.getUserByUsername(loginId);
 
         if (!user) {
-            console.warn(`[AUTH] Login Failed: User NOT FOUND -> "${email}"`);
+            console.warn(`[AUTH] Login Failed: User NOT FOUND -> "${loginId}"`);
             return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
         }
         if (user.status && user.status !== 'active') {
@@ -278,11 +283,11 @@ router.post('/login', async (req, res) => {
 
         const passwordHash = hashPassword(password);
         if (user.password_hash !== passwordHash) {
-            console.warn(`[AUTH] Login Failed: PASSWORD MISMATCH for -> "${email}"`);
+            console.warn(`[AUTH] Login Failed: PASSWORD MISMATCH for -> "${loginId}"`);
             return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
         }
 
-        console.log(`[AUTH] Login Success: "${email}" (is_admin: ${user.is_admin})`);
+        console.log(`[AUTH] Login Success: "${loginId}" (is_admin: ${user.is_admin})`);
         const token = generateToken();
         const userData = { id: user.id, email: user.email, username: user.username, name: user.name, credits: user.credits, is_admin: user.is_admin, status: user.status };
         await dbService.createSession(token, userData);

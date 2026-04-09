@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import Select from 'react-select';
 import QuickDivination from './QuickDivination';
 import Select from 'react-select';
 
@@ -108,6 +109,7 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                 setFormData(prev => ({
                     ...prev,
                     ...user.bazi_data,
+                    timeZone: normalizeTimeZone(user?.bazi_data?.timeZone, DEFAULT_TIME_ZONE)
                     timeZone: normalizeTimeZone(user.bazi_data?.timeZone, DEFAULT_TIME_ZONE)
                 }));
             }
@@ -230,7 +232,10 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
             }
         }
 
-        onAnalyze(formData);
+        onAnalyze({
+            ...formData,
+            timeZone: normalizeTimeZone(formData.timeZone, DEFAULT_TIME_ZONE)
+        });
     };
 
     const formatSelectedDate = () => {
@@ -239,6 +244,21 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
         const weekday = weekdays[date.getDay()];
         return `${weekday}, ${formData.day}/${formData.month}/${formData.year}`;
     };
+
+    const timeZoneOptions = useMemo(() => {
+        return buildTimeZoneOptions().map((option) => ({
+            ...option,
+            searchText: normalizeSearchText(`${option.countryLabel} ${option.value}`)
+        }));
+    }, []);
+
+    const groupedTimeZoneOptions = useMemo(() => {
+        return groupTimeZonesByContinent(timeZoneOptions);
+    }, [timeZoneOptions]);
+
+    const selectedTimeZoneOption = useMemo(() => {
+        return timeZoneOptions.find((item) => item.value === formData.timeZone) || null;
+    }, [timeZoneOptions, formData.timeZone]);
 
     return (
         <div className="input-form-container fade-in">
@@ -282,6 +302,7 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                                             hour: user.bazi_data.hour || 10,
                                             minute: user.bazi_data.minute || 0,
                                             calendar: user.bazi_data.calendar || 'solar',
+                                            timeZone: normalizeTimeZone(user?.bazi_data?.timeZone, DEFAULT_TIME_ZONE)
                                             timeZone: normalizeTimeZone(user.bazi_data.timeZone, DEFAULT_TIME_ZONE)
                                         };
                                         const { apiClient } = await import('../../services/apiClient');
@@ -375,6 +396,8 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                             classNamePrefix="tz-select"
                             className="tz-react-select"
                             options={GENDER_OPTIONS}
+                            value={GENDER_OPTIONS.find((item) => item.value === formData.gender) || GENDER_OPTIONS[0]}
+                            onChange={(option) => setFormData((prev) => ({ ...prev, gender: option?.value || 'Nam' }))}
                             value={selectedGenderOption}
                             onChange={handleGenderSelect}
                             isSearchable={false}
@@ -387,6 +410,18 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                             classNamePrefix="tz-select"
                             className="tz-react-select"
                             options={groupedTimeZoneOptions}
+                            value={selectedTimeZoneOption}
+                            onChange={(option) => setFormData((prev) => ({ ...prev, timeZone: option?.value || DEFAULT_TIME_ZONE }))}
+                            isSearchable
+                            placeholder="Tìm quốc gia hoặc timezone..."
+                            formatGroupLabel={(group) => (
+                                <div className="tz-group-label">{group.label}</div>
+                            )}
+                            filterOption={(option, inputValue) => {
+                                const keyword = normalizeSearchText(inputValue);
+                                if (!keyword) return true;
+                                return option.data.searchText?.includes(keyword);
+                            }}
                             value={selectedTimeZoneOption ? {
                                 value: selectedTimeZoneOption.value,
                                 label: selectedTimeZoneOption.label
@@ -412,6 +447,7 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                         {showDatePicker && (
                             <DatePicker
                                 value={formData}
+                                timeZone={formData.timeZone}
                                 onChange={handleDatePickerChange}
                                 timeZone={selectedTimeZone}
                                 onClose={() => setShowDatePicker(false)}
@@ -425,6 +461,8 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                             classNamePrefix="tz-select"
                             className="tz-react-select"
                             options={HOUR_OPTIONS}
+                            value={HOUR_OPTIONS.find((item) => item.value === formData.hour) || HOUR_OPTIONS[0]}
+                            onChange={(option) => setFormData((prev) => ({ ...prev, hour: Number(option?.value ?? 10) }))}
                             value={selectedHourOption}
                             onChange={handleHourSelect}
                             isSearchable={false}

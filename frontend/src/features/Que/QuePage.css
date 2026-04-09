@@ -78,6 +78,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    direction: ltr;
+    unicode-bidi: normal;
     transform-style: preserve-3d;
 }
 
@@ -123,6 +127,8 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     transform: none;
+    direction: ltr;
+    unicode-bidi: normal;
 }
 
 .card-status {
