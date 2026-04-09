@@ -159,7 +159,7 @@
 
 .user-credits {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -174,7 +174,7 @@
   border-radius: 16px;
   color: #000;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -236,7 +236,7 @@
 
 .dropdown-name {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -264,7 +264,7 @@
 
 .credits-value {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -451,7 +451,7 @@
 
 .header-nav-item .nav-label {
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -632,7 +632,7 @@
 
 .bottom-nav-item .nav-label {
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.2px;
@@ -742,13 +742,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+b,
+strong {
+  font-weight: 500;
+}
+
 h1,
 h2,
 h3,
 h4,
 .mini-brand {
   font-family: var(--font-accent);
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 1.1;
   text-wrap: balance;
@@ -911,7 +916,7 @@ select option,
 .premium-button.small {
   padding: 8px 16px;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.5px;
 }
 
@@ -1195,7 +1200,7 @@ select option,
   border: 1px solid rgba(226, 192, 68, 0.3);
   border-radius: 6px;
   color: var(--accent-gold);
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.85rem;
   padding: 4px 8px;
   text-align: center;
@@ -1275,7 +1280,7 @@ select option,
   text-align: center;
   font-size: 0.45rem;
   /* Reduced to ~75% */
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
   padding: 4px 0;
@@ -1358,12 +1363,12 @@ select option,
 
 .dp-day-dual.new-moon .dp-lunar {
   color: #e74c3c;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .dp-day-dual.full-moon .dp-lunar {
   color: #f1c40f;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .lunar-month-dot {
@@ -1438,7 +1443,7 @@ select option,
 .dp-year-option.selected {
   background: var(--accent-gold);
   color: #000;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 /* Consolidated duplicate DatePicker styles above */
@@ -1544,12 +1549,12 @@ select option,
 
 .dp-day-dual.new-moon .dp-lunar {
   color: #e74c3c;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .dp-day-dual.full-moon .dp-lunar {
   color: #f1c40f;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .lunar-month-dot {
@@ -1626,7 +1631,7 @@ select option,
 
 .toast-icon {
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .toast-message {
@@ -1724,7 +1729,7 @@ select option,
 .cell-gan,
 .cell-chi {
   font-size: 1.6rem;
-  font-weight: 900;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -1963,7 +1968,7 @@ select option,
 }
 
 .info-item .value {
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-primary);
   font-size: 0.9rem;
 }
@@ -2042,7 +2047,7 @@ select option,
 }
 
 .napam-value {
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.9rem;
 }
 
@@ -2060,7 +2065,7 @@ select option,
 .strength-badge {
   padding: 8px 16px;
   border-radius: 6px;
-  font-weight: 900;
+  font-weight: 500;
   letter-spacing: 1px;
 }
 
@@ -2089,11 +2094,11 @@ select option,
   font-size: 0.7rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .stat-val {
-  font-weight: 900;
+  font-weight: 500;
   color: var(--accent-gold);
   font-size: 1rem;
 }
@@ -2188,7 +2193,7 @@ select option,
 }
 
 .e-val {
-  font-weight: 900;
+  font-weight: 500;
   font-size: 1.1rem;
   color: var(--text-primary);
   flex-shrink: 0;
@@ -2266,7 +2271,7 @@ select option,
 
 .cycle-age {
   font-size: 0.85rem;
-  font-weight: 900;
+  font-weight: 500;
   color: var(--accent-gold);
   margin-bottom: 1.2rem;
   display: inline-block;
@@ -2284,7 +2289,7 @@ select option,
 .cycle-gan,
 .cycle-chi {
   font-size: 2.5rem;
-  font-weight: 900;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -2337,7 +2342,7 @@ select option,
 
 .decade-title {
   font-size: 1.1rem;
-  font-weight: 900;
+  font-weight: 500;
   color: var(--accent-gold);
   letter-spacing: 1px;
 }
@@ -2345,7 +2350,7 @@ select option,
 .decade-status {
   font-size: 0.85rem;
   color: var(--text-secondary);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .years-grid {
@@ -2387,7 +2392,7 @@ select option,
 .y-can,
 .y-chi {
   font-size: 1.8rem;
-  font-weight: 900;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -2427,7 +2432,7 @@ select option,
   cursor: pointer;
   font-size: 0.7rem;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .accordion-btn:hover {
@@ -2576,7 +2581,7 @@ select option,
 }
 
 .matrix-nav-btn .m-name {
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.75rem;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -2730,7 +2735,7 @@ select option,
   border-radius: 8px;
   color: white;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 500;
   text-align: center;
 }
 
@@ -2767,7 +2772,7 @@ select option,
 
 .date-section-header .section-title {
   font-size: 1.1rem;
-  font-weight: 900;
+  font-weight: 500;
   color: var(--accent-gold);
   flex: 1;
   letter-spacing: 1px;
@@ -3165,7 +3170,7 @@ select option,
 
 .details-date {
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -3290,7 +3295,7 @@ select option,
 
 .activity-status {
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   padding: 0.2rem 0.6rem;
   border-radius: 12px;
 }
@@ -3517,7 +3522,7 @@ select option,
 
 .mode-tab .tab-text {
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
 }
 
@@ -3632,7 +3637,7 @@ select option,
 .arrow-gold {
   color: var(--accent-gold);
   margin-right: 8px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .star-icon {
@@ -3720,7 +3725,7 @@ select option,
 
 .modern-accordion-header .section-title {
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -3824,7 +3829,7 @@ select option,
   margin: 0;
   font-size: 1.1rem;
   letter-spacing: 4px;
-  font-weight: 700;
+  font-weight: 500;
   color: #fff;
   text-transform: uppercase;
   font-family: var(--font-accent);
@@ -3896,7 +3901,7 @@ select option,
 
 .p-shishen {
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -3960,7 +3965,7 @@ select option,
   background: transparent;
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -4042,7 +4047,7 @@ select option,
 
 .cycle-footer .shishen {
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -4119,7 +4124,7 @@ select option,
 
 .detail-text.gold {
   color: var(--accent-gold);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .detail-text-muted {
@@ -4249,7 +4254,7 @@ select option,
   padding: 0.8rem 1.5rem;
   margin: 0;
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 2px;
   border-bottom: 1px solid rgba(226, 192, 68, 0.15);
@@ -4302,7 +4307,7 @@ select option,
 .luan-giai-header {
   color: var(--accent-gold);
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 500;
   margin: 1.5rem 0 1rem 0;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(226, 192, 68, 0.2);
@@ -4428,7 +4433,7 @@ select option,
   border: none;
   padding: 0.6rem 1.5rem;
   border-radius: 6px;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -4609,7 +4614,7 @@ select option,
   margin: 0;
   font-size: 0.95rem;
   color: var(--accent-gold);
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 1px;
 }
 
@@ -4662,7 +4667,7 @@ select option,
   color: var(--accent-gold);
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .section-text {
@@ -4926,7 +4931,7 @@ select option,
   border: 1px solid rgba(255, 215, 0, 0.5);
   border-radius: 50px;
   color: #1a1a1a;
-  font-weight: 700;
+  font-weight: 500;
   box-shadow: 0 4px 15px rgba(253, 185, 49, 0.4);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -5015,7 +5020,7 @@ select option,
   border: 1px solid rgba(255, 215, 0, 0.5);
   border-radius: 50px;
   color: #1a1a1a;
-  font-weight: 700;
+  font-weight: 500;
   box-shadow: 0 4px 15px rgba(253, 185, 49, 0.4);
   cursor: pointer;
   transition: all 0.3s ease;
@@ -5126,7 +5131,7 @@ select option,
   margin: 0;
   color: var(--accent-gold);
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .pdf-export-dropdown .close-btn {
@@ -5221,7 +5226,7 @@ select option,
   color: #fff;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.5px;
 }
 
@@ -5368,7 +5373,7 @@ select option,
 
 .stat-card .stat-value {
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
   text-align: center;
 }
@@ -5473,7 +5478,7 @@ select option,
 .info-row .info-label {
   min-width: 120px;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -5568,7 +5573,7 @@ select option,
 
 .finding-type {
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
   text-transform: uppercase;
 }
@@ -5747,7 +5752,7 @@ select option,
 }
 
 .info-grid-compact .info-item .value {
-  font-weight: 700;
+  font-weight: 500;
   color: #fff;
   font-size: 0.95rem;
 }
@@ -5849,7 +5854,7 @@ select option,
 
 .element-score-item .el-name {
   min-width: 50px;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.9rem;
 }
 
@@ -5870,7 +5875,7 @@ select option,
 .element-score-item .el-value {
   min-width: 30px;
   text-align: right;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.9rem;
 }
 
@@ -5947,7 +5952,7 @@ select option,
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.6rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .info-mini-grid,
@@ -6111,7 +6116,7 @@ select option,
 
 .section-card-header .card-title {
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #fff;
   margin: 0;
   text-transform: uppercase;
@@ -6136,7 +6141,7 @@ select option,
 
 .section-card .card-item.highlight-item .item-label {
   color: var(--accent-gold);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .section-card .item-label {
@@ -6384,7 +6389,7 @@ select option,
 .thap-than-chip .tt-count {
   font-size: 0.7rem;
   color: var(--accent-gold);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .thap-than-chip .tt-desc {
@@ -6634,7 +6639,7 @@ select option,
 
 .ts-chi {
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #fff;
   margin-bottom: 0.4rem;
 }
@@ -6715,7 +6720,7 @@ select option,
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
-  font-weight: bold;
+  font-weight: 500;
   color: #000;
   box-shadow: 0 0 15px rgba(226, 192, 68, 0.3);
 }
@@ -6836,7 +6841,7 @@ select option,
   color: #000;
   border: none;
   border-radius: 8px;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   letter-spacing: 1px;
@@ -6940,7 +6945,7 @@ select option,
 .current-year-label {
   font-size: 10px;
   fill: #fff;
-  font-weight: bold;
+  font-weight: 500;
   pointer-events: none;
 }
 
@@ -7021,7 +7026,7 @@ select option,
 
 .eval-label {
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
 }
@@ -7120,7 +7125,7 @@ select option,
 .list-bullet {
   color: var(--accent-gold);
   margin-right: 8px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 /* Animations */
@@ -7242,7 +7247,7 @@ select option,
   display: flex;
   gap: 12px;
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-muted);
 }
 
@@ -7256,7 +7261,7 @@ select option,
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -7567,7 +7572,7 @@ select option,
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-secondary);
 }
 
@@ -7627,7 +7632,7 @@ select option,
 
 .ai-response-formatted .ai-heading {
   color: var(--accent-gold);
-  font-weight: 700;
+  font-weight: 500;
   margin: 1.5rem 0 0.8rem 0;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(226, 192, 68, 0.2);
@@ -7684,7 +7689,7 @@ select option,
   background: linear-gradient(135deg, var(--accent-gold), #b8860b);
   color: #000;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -7780,7 +7785,7 @@ select option,
   background: linear-gradient(135deg, var(--accent-gold), #b8860b);
   color: #000;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 500;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -8054,7 +8059,7 @@ select option,
 
 .dashboard-card .card-value {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 500;
   display: block;
 }
 
@@ -8531,7 +8536,7 @@ select option,
   background: rgba(255, 255, 255, 0.03);
   border-radius: 10px;
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .credit-add {
@@ -9329,7 +9334,7 @@ a.category-card {
 
 .credit-amount {
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -9399,13 +9404,13 @@ a.category-card {
 .credit-add {
   color: #34d399;
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .credit-deduct {
   color: #ef4444;
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 /* Credit Request Modal */
@@ -9760,7 +9765,7 @@ a.category-card {
 }
 
 .header-credits .credit-value {
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -10028,7 +10033,7 @@ a.category-card {
 .captcha-question {
   flex: 1;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
   font-family: 'Courier New', monospace;
   letter-spacing: 2px;
@@ -10145,7 +10150,7 @@ a.category-card {
 .persona-name {
   margin: 0 0 0.2rem 0;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -10169,7 +10174,7 @@ a.category-card {
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 /* Follow-up Section */
@@ -10184,7 +10189,7 @@ a.category-card {
 .follow-up-title {
   margin: 0 0 1rem 0;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -10344,7 +10349,7 @@ a.category-card {
 
 .credits-count {
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent-gold);
 }
 
@@ -11026,7 +11031,7 @@ a.category-card {
 
 .comprehensive-modal .modal-title {
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #fff;
   margin-bottom: 0.5rem;
   text-align: center;
@@ -11100,7 +11105,7 @@ a.category-card {
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .cost-info {
@@ -11122,7 +11127,7 @@ a.category-card {
 
 .cost-info .cost-value {
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #fcd34d;
 }
 
@@ -11425,7 +11430,7 @@ a.category-card {
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.15));
   border-left: 3px solid #8b5cf6;
   border-radius: 0 10px 10px 0;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.85rem;
   color: #f9a8d4;
 }
@@ -11892,7 +11897,7 @@ a.category-card {
   display: block;
   color: #fff;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 500;
   margin-bottom: 4px;
 }
 
@@ -12187,7 +12192,7 @@ a.category-card {
 .articles-title {
   margin: 0;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .title-highlight {
@@ -12281,7 +12286,7 @@ a.category-card {
 .article-main-title {
   margin: 0 0 0.75rem 0;
   font-size: 1.4rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.4;
   color: var(--text-primary);
 }
@@ -12455,7 +12460,7 @@ a.category-card {
 .article-detail-title {
   margin: 0 0 1rem 0;
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.3;
   color: var(--text-primary);
 }

@@ -1,4 +1,5 @@
 import html2canvas from 'html2canvas';
+import { SYSTEM_FONT_FAMILY } from '../styles/systemFontFamily';
 
 // Element Colors - More vibrant
 const COLORS = {
@@ -30,7 +31,7 @@ const createHTMLContent = (data) => {
         position: fixed; top: 0; left: -9999px;
         width: 820px; padding: 0;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        font-family: ${SYSTEM_FONT_FAMILY};
         color: #fff;
     `;
 
@@ -111,9 +112,9 @@ const createHTMLContent = (data) => {
             .card { background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
             .t { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
             .t th, .t td { padding: 10px 8px; text-align: center; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.08); }
-            .lbl { background: linear-gradient(90deg, rgba(212,175,55,0.15) 0%, transparent 100%); font-weight: 700; color: #D4AF37; text-align: left !important; width: 90px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-right: 2px solid rgba(212,175,55,0.3); }
+            .lbl { background: linear-gradient(90deg, rgba(212,175,55,0.15) 0%, transparent 100%); font-weight: 500; color: #D4AF37; text-align: left !important; width: 90px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-right: 2px solid rgba(212,175,55,0.3); }
             .hl { background: linear-gradient(180deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.05) 100%); }
-            .bazi { font-size: 32px; font-weight: 900; line-height: 1.15; padding: 15px 8px !important; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+            .bazi { font-size: 32px; font-weight: 500; line-height: 1.15; padding: 15px 8px !important; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
             .section-title { background: linear-gradient(90deg, #D4AF37 0%, #aa8a2e 100%); color: #000; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 15px; border-radius: 8px 8px 0 0; text-align: center; }
             .luck-cell { padding: 8px 4px !important; transition: all 0.2s; }
             .luck-cell.current { background: linear-gradient(180deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.1) 100%); border: 2px solid #D4AF37; border-radius: 8px; }
@@ -123,10 +124,10 @@ const createHTMLContent = (data) => {
         <div style="background: linear-gradient(135deg, #D4AF37 0%, #8B7355 50%, #D4AF37 100%); padding: 25px 30px; display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div style="width: 65px; height: 65px; background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-                    <span style="font-size: 14px; font-weight: 900; color: #D4AF37; text-align: center; line-height: 1.1;">HUYỀN<br/>CƠ</span>
+                    <span style="font-size: 14px; font-weight: 500; color: #D4AF37; text-align: center; line-height: 1.1;">HUYỀN<br/>CƠ</span>
                 </div>
                 <div>
-                    <div style="font-size: 28px; font-weight: 900; color: #1a1a2e; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 1px 2px rgba(255,255,255,0.3);">TỨ TRỤ MỆNH BÀN</div>
+                    <div style="font-size: 28px; font-weight: 500; color: #1a1a2e; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 1px 2px rgba(255,255,255,0.3);">TỨ TRỤ MỆNH BÀN</div>
                     <div style="font-size: 11px; color: rgba(0,0,0,0.6); margin-top: 3px; letter-spacing: 1px;">PHÂN TÍCH BÁT TỰ CHUYÊN SÂU</div>
                 </div>
             </div>
@@ -224,8 +225,8 @@ const createHTMLContent = (data) => {
         const { can, chi } = splitCanChi(ln.can_chi);
         const isCurrent = ln.nam === currentYear;
         return `<td class="luck-cell ${isCurrent ? 'current' : ''}">
-                                <div style="font-size: 14px; font-weight: 700; color:${getColor(can)}">${can}</div>
-                                <div style="font-size: 14px; font-weight: 700; color:${getColor(chi)}">${chi}</div>
+                                <div style="font-size: 14px; font-weight: 500; color:${getColor(can)}">${can}</div>
+                                <div style="font-size: 14px; font-weight: 500; color:${getColor(chi)}">${chi}</div>
                                 <div style="font-size: 9px; color: #666; margin-top: 3px;">${ln.nam}<br/><span style="color:#888">${ln.tuoi}t</span></div>
                             </td>`;
     }).join('')}
@@ -235,8 +236,8 @@ const createHTMLContent = (data) => {
                         ${luuNienData2.slice(0, 10).map(ln => {
         const { can, chi } = splitCanChi(ln.can_chi);
         return `<td class="luck-cell">
-                                <div style="font-size: 14px; font-weight: 700; color:${getColor(can)}">${can}</div>
-                                <div style="font-size: 14px; font-weight: 700; color:${getColor(chi)}">${chi}</div>
+                                <div style="font-size: 14px; font-weight: 500; color:${getColor(can)}">${can}</div>
+                                <div style="font-size: 14px; font-weight: 500; color:${getColor(chi)}">${chi}</div>
                                 <div style="font-size: 9px; color: #666; margin-top: 3px;">${ln.nam}<br/><span style="color:#888">${ln.tuoi}t</span></div>
                             </td>`;
     }).join('')}
@@ -248,10 +249,10 @@ const createHTMLContent = (data) => {
             <!-- Footer Grid -->
             <div style="display: grid; grid-template-columns: 200px 1fr; gap: 12px;">
                 <div class="card" style="padding: 15px;">
-                    <div style="font-size: 10px; color: #D4AF37; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Thông Tin Bổ Sung</div>
+                    <div style="font-size: 10px; color: #D4AF37; font-weight: 500; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Thông Tin Bổ Sung</div>
                     <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
-                        <div style="display: flex; justify-content: space-between;"><span style="color: #888;">Mệnh Cung</span><span style="font-weight: 700; color: #fff;">${info.menh_cung || '—'}</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span style="color: #888;">Thai Nguyên</span><span style="font-weight: 700; color: #fff;">${info.thai_nguyen || '—'}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span style="color: #888;">Mệnh Cung</span><span style="font-weight: 500; color: #fff;">${info.menh_cung || '—'}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span style="color: #888;">Thai Nguyên</span><span style="font-weight: 500; color: #fff;">${info.thai_nguyen || '—'}</span></div>
                         <div style="display: flex; justify-content: space-between;"><span style="color: #888;">Niên Không</span><span style="color: #aaa;">${info.nien_khong || '—'}</span></div>
                         <div style="display: flex; justify-content: space-between;"><span style="color: #888;">Nhật Không</span><span style="color: #aaa;">${info.nhat_khong || '—'}</span></div>
                     </div>
@@ -260,10 +261,10 @@ const createHTMLContent = (data) => {
                     <div class="section-title">⭐ THẦN SÁT NGUYÊN CỤC</div>
                     <table class="t" style="border: none;">
                         <tr style="background: rgba(255,255,255,0.03);">
-                            <td style="font-size: 10px; font-weight: 700; color: #D4AF37;">NIÊN THẦN</td>
-                            <td style="font-size: 10px; font-weight: 700; color: #D4AF37;">NGUYỆT THẦN</td>
-                            <td style="font-size: 10px; font-weight: 700; color: #D4AF37;">NHẬT THẦN</td>
-                            <td style="font-size: 10px; font-weight: 700; color: #D4AF37;">THỜI THẦN</td>
+                            <td style="font-size: 10px; font-weight: 500; color: #D4AF37;">NIÊN THẦN</td>
+                            <td style="font-size: 10px; font-weight: 500; color: #D4AF37;">NGUYỆT THẦN</td>
+                            <td style="font-size: 10px; font-weight: 500; color: #D4AF37;">NHẬT THẦN</td>
+                            <td style="font-size: 10px; font-weight: 500; color: #D4AF37;">THỜI THẦN</td>
                         </tr>
                         <tr>
                             <td style="font-size: 11px; color: #ccc; line-height: 1.5;">${(yearP.than_sat || []).join('<br/>') || '—'}</td>

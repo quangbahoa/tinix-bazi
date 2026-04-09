@@ -146,7 +146,7 @@
     color: var(--gold);
     padding: 2px 8px;
     border-radius: 4px;
-    font-weight: 700;
+    font-weight: 500;
     text-transform: uppercase;
 }
 
@@ -264,7 +264,7 @@
 }
 
 .chart-display-mini .person-name {
-    font-weight: 700;
+    font-weight: 500;
     color: var(--gold);
 }
 
@@ -304,7 +304,7 @@
 
 .mini-pillar .pillar-gan,
 .mini-pillar .pillar-zhi {
-    font-weight: 700;
+    font-weight: 500;
     font-size: 1rem;
     line-height: 1.4;
 }

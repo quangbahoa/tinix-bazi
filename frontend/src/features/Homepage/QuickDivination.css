@@ -64,7 +64,7 @@
 .topic-btn.active {
   background: linear-gradient(135deg, var(--accent-gold), #b8860b);
   color: #000;
-  font-weight: 700;
+  font-weight: 500;
   border-color: transparent;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 175, 55, 0.3);
 }
@@ -160,7 +160,7 @@
     border-radius: 4px;
     font-size: 0.65rem;
     margin-top: 3px;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .quality-good {
@@ -328,7 +328,7 @@
 
 .quick-divination-container .quick-markdown strong {
   color: var(--accent-gold);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 /* 3D Mystical Animation Overlay */

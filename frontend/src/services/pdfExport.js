@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { SYSTEM_FONT_FAMILY } from '../styles/systemFontFamily';
 
 const WATERMARK = 'vietlac.com';
 
@@ -46,7 +47,7 @@ const createRadarSVG = (scores) => {
         const lx = cx + (radius + 18) * Math.cos(angle);
         const ly = cy + (radius + 18) * Math.sin(angle);
         svg += `<circle cx="${pointsData[i].x}" cy="${pointsData[i].y}" r="3" fill="${colors[i]}"/>`;
-        svg += `<text x="${lx}" y="${ly - 3}" fill="${colors[i]}" font-size="9" font-weight="700" text-anchor="middle">${elements[i]}</text>`;
+        svg += `<text x="${lx}" y="${ly - 3}" fill="${colors[i]}" font-size="9" font-weight="500" text-anchor="middle">${elements[i]}</text>`;
         svg += `<text x="${lx}" y="${ly + 8}" fill="#666" font-size="8" text-anchor="middle">${values[i]}</text>`;
     }
 
@@ -76,7 +77,7 @@ const createPDFContent = (data, options) => {
         position: fixed; top: 0; left: -9999px;
         width: 800px; padding: 20px;
         background: #0a0a0a;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        font-family: ${SYSTEM_FONT_FAMILY};
         color: #fff;
     `;
 
@@ -97,7 +98,7 @@ const createPDFContent = (data, options) => {
             .text-lg { font-size: 12px; }
             .text-xl { font-size: 16px; }
 
-            .font-bold { font-weight: 700; }
+            .font-bold { font-weight: 500; }
             .font-extrabold { font-weight: 500; }
             
             .header { background: linear-gradient(135deg, #d4af37, #aa8a2e); padding: 14px 20px; border-radius: 6px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -109,7 +110,7 @@ const createPDFContent = (data, options) => {
             .info-left { flex: 3; }
             .info-right { flex: 1; }
             
-            .section-title { text-align: center; color: #d4af37; font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 12px; }
+            .section-title { text-align: center; color: #d4af37; font-size: 12px; font-weight: 500; letter-spacing: 2px; margin-bottom: 12px; }
             
             .info-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; }
             .info-box { background: #111; border: 1px solid #222; border-radius: 6px; padding: 8px 10px; }
@@ -119,7 +120,7 @@ const createPDFContent = (data, options) => {
             .info-box .value.gold { color: #d4af37; }
             
             .radar-section { background: #111; border: 1px solid #222; border-radius: 6px; padding: 10px; text-align: center; }
-            .radar-title { color: #d4af37; font-size: 10px; font-weight: 700; margin-bottom: 5px; }
+            .radar-title { color: #d4af37; font-size: 10px; font-weight: 500; margin-bottom: 5px; }
             
             .nap-am-title { text-align: center; color: #d4af37; font-size: 10px; margin-bottom: 8px; }
             .nap-am-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -130,10 +131,10 @@ const createPDFContent = (data, options) => {
             .strength-row { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; }
             .strength-badge { background: linear-gradient(135deg, #8b0000, #dc143c); padding: 8px 14px; border-radius: 20px; }
             .strength-badge.strong { background: linear-gradient(135deg, #006400, #228b22); }
-            .strength-badge .text { color: #fff; font-size: 10px; font-weight: 700; }
+            .strength-badge .text { color: #fff; font-size: 10px; font-weight: 500; }
             .stat-box { background: #111; border: 1px solid #222; border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
             .stat-box .label { color: #666; font-size: 8px; }
-            .stat-box .val { color: #fff; font-size: 12px; font-weight: 700; }
+            .stat-box .val { color: #fff; font-size: 12px; font-weight: 500; }
             .stat-box.temp { border-color: #3498db; }
             .stat-box.temp .val { color: #3498db; }
             
@@ -155,7 +156,7 @@ const createPDFContent = (data, options) => {
             .water { color: #3498db; }
             
             .bazi-header { background: linear-gradient(135deg, #0d4d4d, #1a6666); padding: 12px; text-align: center; border-radius: 6px; margin-bottom: 14px; }
-            .bazi-header .text { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 3px; }
+            .bazi-header .text { color: #fff; font-size: 13px; font-weight: 500; letter-spacing: 3px; }
             
             .pillars-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 14px; }
             .pillar-card { background: #111; border: 1px solid #222; border-radius: 8px; padding: 10px 6px; text-align: center; }
@@ -168,12 +169,12 @@ const createPDFContent = (data, options) => {
             .pillar-tang { font-size: 7px; color: #555; }
             
             .analysis-section { margin-bottom: 16px; background: #111; border: 1px solid #222; border-radius: 8px; overflow: hidden; }
-            .analysis-header { background: #1a1a1a; padding: 10px 16px; border-left: 3px solid #d4af37; color: #d4af37; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+            .analysis-header { background: #1a1a1a; padding: 10px 16px; border-left: 3px solid #d4af37; color: #d4af37; font-size: 11px; font-weight: 500; letter-spacing: 1px; }
             .analysis-header.fire { border-left-color: #e74c3c; color: #e74c3c; }
             .analysis-header.gold { border-left-color: #f1c40f; color: #f1c40f; }
             .analysis-body { padding: 12px 16px; }
             .analysis-row { margin-bottom: 10px; }
-            .analysis-label { display: block; color: #666; font-size: 8px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
+            .analysis-label { display: block; color: #666; font-size: 8px; font-weight: 500; margin-bottom: 4px; text-transform: uppercase; }
             .analysis-label.gold { color: #d4af37; }
             .analysis-content { color: #aaa; font-size: 9px; line-height: 1.5; }
             .analysis-item { margin-bottom: 6px; color: #888; font-size: 8px; line-height: 1.4; }
@@ -482,7 +483,7 @@ const createPDFContent = (data, options) => {
 
                 // Header (Diamond)
                 if (processed.startsWith('♦')) {
-                    return `<div class="text-base" style="color:inherit; font-weight:bold; margin-top:6px; margin-bottom:2px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:2px">${processed}</div>`;
+                    return `<div class="text-base" style="color:inherit; font-weight:500; margin-top:6px; margin-bottom:2px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:2px">${processed}</div>`;
                 }
                 // List items
                 if (processed.startsWith('➤') || processed.startsWith('-') || processed.startsWith('>')) {
@@ -625,7 +626,7 @@ function showLoading() {
     const div = document.createElement('div');
     div.id = 'pdf-loading';
     div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;z-index:99999;';
-    div.innerHTML = '<div style="text-align:center;color:#d4af37;"><div style="font-size:40px;margin-bottom:12px;">📄</div><div style="font-size:14px;font-weight:700;">Đang tạo PDF...</div></div>';
+    div.innerHTML = '<div style="text-align:center;color:#d4af37;"><div style="font-size:40px;margin-bottom:12px;">📄</div><div style="font-size:14px;font-weight: 500;">Đang tạo PDF...</div></div>';
     document.body.appendChild(div);
 }
 
