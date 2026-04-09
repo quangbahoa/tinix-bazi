@@ -112,7 +112,6 @@ const DatePicker = ({ value, onChange, onClose, timeZone }) => {
     const handleMonthChange = (e) => {
         setViewDate(prev => ({ ...prev, month: parseInt(e.target.value) }));
     };
-
     const years = [];
     for (let y = 1900; y <= 2100; y++) {
         years.push(y);

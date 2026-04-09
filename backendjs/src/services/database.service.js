@@ -135,6 +135,12 @@ class DatabaseService {
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        const customerTableInfo = await this.all(`PRAGMA table_info(customers)`);
+        const customerColumns = customerTableInfo.map(c => c.name);
+        if (!customerColumns.includes('time_zone')) {
+            console.log('[DB] Migrating customers: adding time_zone');
+            await this.run(`ALTER TABLE customers ADD COLUMN time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh'`);
+        }
 
         // customers.time_zone migration for old databases
         const customerColumns = await this.all(`PRAGMA table_info(customers)`);

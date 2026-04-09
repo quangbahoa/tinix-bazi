@@ -12701,6 +12701,96 @@ a.category-card {
   align-items: center;
 }
 
+.dp-timezone-row {
+  margin-bottom: 0.6rem;
+  height: auto;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.dp-timezone-label {
+  display: block;
+  font-size: 0.78rem;
+  opacity: 0.85;
+  margin-bottom: 0.25rem;
+}
+
+.dp-timezone-select {
+  width: 100%;
+  min-height: 42px;
+  max-width: 100%;
+}
+
+.dp-timezone-group {
+  width: 100%;
+  margin-bottom: 0.45rem;
+}
+
+.dp-timezone-search {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.timezone-input-group {
+  position: relative;
+}
+
+.tz-react-select {
+  width: 100%;
+}
+
+.tz-select__control {
+  min-height: 44px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(226, 192, 68, 0.3) !important;
+  background: rgba(20, 24, 39, 0.55) !important;
+  box-shadow: none !important;
+}
+
+.tz-select__value-container {
+  padding: 2px 10px !important;
+}
+
+.tz-select__single-value,
+.tz-select__input-container,
+.tz-select__placeholder {
+  color: #f5f5f5 !important;
+}
+
+.tz-select__menu {
+  z-index: 60 !important;
+  background: rgba(8, 12, 24, 0.98) !important;
+  border: 1px solid rgba(226, 192, 68, 0.35) !important;
+}
+
+.tz-select__group-heading {
+  color: rgba(226, 192, 68, 0.9) !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tz-select__option {
+  color: #f5f5f5 !important;
+  background: transparent !important;
+}
+
+.tz-select__option--is-focused {
+  background: rgba(226, 192, 68, 0.14) !important;
+}
+
+.tz-select__option--is-selected {
+  background: rgba(226, 192, 68, 0.24) !important;
+}
+
+.input-hint {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
 .dp-nav-btn,
 .dp-select-label,
 .dp-year-select {

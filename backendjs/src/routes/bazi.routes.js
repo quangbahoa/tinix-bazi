@@ -16,6 +16,18 @@ function normalizeTimeZone(timeZone) {
     }
 }
 
+const DEFAULT_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+
+function normalizeTimeZone(timeZone) {
+    if (!timeZone || typeof timeZone !== 'string') return DEFAULT_TIME_ZONE;
+    try {
+        Intl.DateTimeFormat(undefined, { timeZone });
+        return timeZone;
+    } catch {
+        return DEFAULT_TIME_ZONE;
+    }
+}
+
 // Protect only BaZi endpoints in this router (avoid affecting /api/auth/*).
 router.use([
     '/analyze',
@@ -45,6 +57,8 @@ router.use([
 router.get('/analyze', async (req, res) => {
     try {
         const { year, month, day, hour = 12, minute = 0, gender = 'Nam', calendar = 'solar', name = '', timeZone } = req.query;
+        const { year, month, day, hour = 12, minute = 0, gender = 'Nam', calendar = 'solar', name = '', timeZone = DEFAULT_TIME_ZONE } = req.query;
+        const normalizedTimeZone = normalizeTimeZone(timeZone);
 
         if (!year || !month || !day) {
             return res.status(400).json({ error: 'Missing required parameters: year, month, day' });

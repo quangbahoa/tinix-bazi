@@ -404,6 +404,56 @@ tinix-bazi/
 | `minute` | number | ❌ | Phút sinh (mặc định: 0) |
 | `gender` | string | ❌ | "Nam" hoặc "Nữ" (mặc định: "Nam") |
 | `calendar` | string | ❌ | "solar" hoặc "lunar" (mặc định: "solar") |
+| `timeZone` | string | ❌ | IANA timezone, ví dụ `Asia/Ho_Chi_Minh` (mặc định/fallback: `Asia/Ho_Chi_Minh`) |
+
+#### Hướng dẫn gửi data qua REST API (query vs body)
+
+- Các endpoint `GET` (ví dụ `/api/analyze`) nhận data qua **query string**.
+- Các endpoint `POST` (ví dụ `/api/auth/register`, `/api/matching`) nhận data qua **JSON body**.
+- Luôn gửi `Authorization` theo rule endpoint (`Bearer` hoặc `ApiKey`) và thêm `Content-Type: application/json` cho request có body.
+
+**Ví dụ GET `/api/analyze` (query params):**
+
+```bash
+curl -s -G "http://localhost:8888/api/analyze" \
+  -H "Authorization: ApiKey YOUR_USER_API_KEY" \
+  --data-urlencode "year=1992" \
+  --data-urlencode "month=12" \
+  --data-urlencode "day=8" \
+  --data-urlencode "hour=10" \
+  --data-urlencode "minute=0" \
+  --data-urlencode "gender=Nam" \
+  --data-urlencode "calendar=solar" \
+  --data-urlencode "timeZone=Asia/Ho_Chi_Minh" \
+  --data-urlencode "name=Nguyen Van A"
+```
+
+**Ví dụ POST `/api/auth/register` (JSON body):**
+
+```bash
+curl -s -X POST "http://localhost:8888/api/auth/register" \
+  -H "Authorization: ApiKey YOUR_API_KEY_REGISTER_VALUE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "u@example.com",
+    "username": "user1",
+    "password": "secret",
+    "name": "User One"
+  }'
+```
+
+**Ví dụ POST `/api/matching` (JSON body):**
+
+```bash
+curl -s -X POST "http://localhost:8888/api/matching" \
+  -H "Authorization: ApiKey YOUR_USER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "person1": { "year": 1990, "month": 5, "day": 15, "hour": 10, "gender": "Nam", "name": "A" },
+    "person2": { "year": 1992, "month": 8, "day": 22, "hour": 9, "gender": "Nữ", "name": "B" },
+    "relationship": "romance"
+  }'
+```
 
 ### AI Consultant
 | Method | Path | Mô tả |

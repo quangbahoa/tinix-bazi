@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Select from 'react-select';
 import QuickDivination from './QuickDivination';
+import Select from 'react-select';
 
 import DatePicker from './DatePicker';
 import Toast from '../../components/Toast';
@@ -109,6 +110,7 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                     ...prev,
                     ...user.bazi_data,
                     timeZone: normalizeTimeZone(user?.bazi_data?.timeZone, DEFAULT_TIME_ZONE)
+                    timeZone: normalizeTimeZone(user.bazi_data?.timeZone, DEFAULT_TIME_ZONE)
                 }));
             }
             sessionStorage.setItem('homepage_form_initialized', 'true');
@@ -117,6 +119,36 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
 
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [toast, setToast] = useState(null);
+    const timeZoneOptions = useMemo(() => buildTimeZoneOptions(), []);
+    const selectedTimeZone = normalizeTimeZone(formData.timeZone, DEFAULT_TIME_ZONE);
+    const selectedTimeZoneOption = useMemo(
+        () => timeZoneOptions.find((item) => item.value === selectedTimeZone) || null,
+        [timeZoneOptions, selectedTimeZone]
+    );
+    const groupedTimeZoneOptions = useMemo(() => (
+        groupTimeZonesByContinent(timeZoneOptions).map((group) => ({
+            label: group.label,
+            options: group.options.map((item) => ({
+                value: item.value,
+                label: item.label,
+                searchText: `${item.countryLabel} ${item.value}`
+            }))
+        }))
+    ), [timeZoneOptions]);
+    const selectedGenderOption = useMemo(
+        () => GENDER_OPTIONS.find((item) => item.value === formData.gender) || GENDER_OPTIONS[0],
+        [formData.gender]
+    );
+    const selectedHourOption = useMemo(
+        () => HOUR_OPTIONS.find((item) => item.value === formData.hour) || HOUR_OPTIONS[0],
+        [formData.hour]
+    );
+    const filterTimeZoneOption = (candidate, rawInput) => {
+        const keyword = normalizeSearchText(rawInput);
+        if (!keyword) return true;
+        const haystack = normalizeSearchText(candidate.data.searchText);
+        return haystack.startsWith(keyword) || haystack.includes(` ${keyword}`);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -136,6 +168,18 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
             month: date.month,
             day: date.day
         }));
+    };
+    const handleTimeZoneChange = (timeZone) => {
+        setFormData(prev => ({ ...prev, timeZone: normalizeTimeZone(timeZone, DEFAULT_TIME_ZONE) }));
+    };
+    const handleTimeZoneSelect = (option) => {
+        handleTimeZoneChange(option?.value || DEFAULT_TIME_ZONE);
+    };
+    const handleGenderSelect = (option) => {
+        setFormData((prev) => ({ ...prev, gender: option?.value || 'Nam' }));
+    };
+    const handleHourSelect = (option) => {
+        setFormData((prev) => ({ ...prev, hour: Number(option?.value ?? 10) }));
     };
 
     const handleDoiLaSo = () => {
@@ -259,6 +303,7 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                                             minute: user.bazi_data.minute || 0,
                                             calendar: user.bazi_data.calendar || 'solar',
                                             timeZone: normalizeTimeZone(user?.bazi_data?.timeZone, DEFAULT_TIME_ZONE)
+                                            timeZone: normalizeTimeZone(user.bazi_data.timeZone, DEFAULT_TIME_ZONE)
                                         };
                                         const { apiClient } = await import('../../services/apiClient');
                                         const result = await apiClient.analyze(params);
@@ -353,6 +398,8 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                             options={GENDER_OPTIONS}
                             value={GENDER_OPTIONS.find((item) => item.value === formData.gender) || GENDER_OPTIONS[0]}
                             onChange={(option) => setFormData((prev) => ({ ...prev, gender: option?.value || 'Nam' }))}
+                            value={selectedGenderOption}
+                            onChange={handleGenderSelect}
                             isSearchable={false}
                         />
                     </div>
@@ -375,6 +422,16 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                                 if (!keyword) return true;
                                 return option.data.searchText?.includes(keyword);
                             }}
+                            value={selectedTimeZoneOption ? {
+                                value: selectedTimeZoneOption.value,
+                                label: selectedTimeZoneOption.label
+                            } : null}
+                            onChange={handleTimeZoneSelect}
+                            filterOption={filterTimeZoneOption}
+                            placeholder="Tìm múi giờ (VD: Asia/Ho_Chi_Minh)"
+                            isSearchable
+                            maxMenuHeight={280}
+                            noOptionsMessage={() => 'Không tìm thấy múi giờ phù hợp'}
                         />
                     </div>
 
@@ -392,6 +449,7 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                                 value={formData}
                                 timeZone={formData.timeZone}
                                 onChange={handleDatePickerChange}
+                                timeZone={selectedTimeZone}
                                 onClose={() => setShowDatePicker(false)}
                             />
                         )}
@@ -405,6 +463,8 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                             options={HOUR_OPTIONS}
                             value={HOUR_OPTIONS.find((item) => item.value === formData.hour) || HOUR_OPTIONS[0]}
                             onChange={(option) => setFormData((prev) => ({ ...prev, hour: Number(option?.value ?? 10) }))}
+                            value={selectedHourOption}
+                            onChange={handleHourSelect}
                             isSearchable={false}
                         />
                         <small className="input-hint">Ngày giờ sinh được hiểu theo múi giờ đã chọn.</small>

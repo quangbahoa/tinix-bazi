@@ -312,14 +312,14 @@ const ConsultantPage = ({ userData }) => {
     const personas = [
         {
             id: 'huyen_co',
-            name: 'Thầy Viet Lac So',
+            name: 'Thầy Quảng',
             icon: '🧙‍♂️',
             title: 'Bậc Thầy Bát Tự',
             desc: '35 năm kinh nghiệm, nhân văn, uyên bác.'
         },
         {
             id: 'menh_meo',
-            name: 'Thầy Mệnh Mèo GenZ',
+            name: 'Tù trưởng Bường A Lỏ',
             icon: '🐱',
             title: 'GenZ Tư Vấn Mệnh',
             desc: 'Hài hước, cực viral, chuyên gia pressing vận mệnh.'

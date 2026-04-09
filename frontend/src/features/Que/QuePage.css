@@ -71,6 +71,7 @@
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     border-radius: 16px;
     overflow: hidden;
     display: flex;
@@ -81,12 +82,14 @@
     transform-style: preserve-3d;
     direction: ltr;
     unicode-bidi: normal;
+    transform-style: preserve-3d;
 }
 
 /* Front Face */
 .que-card-front {
     background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
     border: 2px solid rgba(226, 192, 68, 0.3);
+    transform: rotateY(0deg);
 }
 
 .card-pattern {
