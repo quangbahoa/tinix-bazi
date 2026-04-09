@@ -31,8 +31,24 @@ const parseApiKeyFromAuthorization = (authorization) => {
     return match ? match[1].trim() : null;
 };
 
+const API_KEY_CHARSET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const API_KEY_PART_LENGTH = 36;
+
+const generateApiKeyPart = (length = API_KEY_PART_LENGTH) => {
+    let out = '';
+    while (out.length < length) {
+        const bytes = crypto.randomBytes(64);
+        for (const b of bytes) {
+            // 248 is highest multiple of 62 under 256, avoids modulo bias
+            if (b < 248) out += API_KEY_CHARSET[b % API_KEY_CHARSET.length];
+            if (out.length === length) break;
+        }
+    }
+    return out;
+};
+
 const generateUserApiKey = (username) => {
-    return `${username}_${crypto.randomBytes(32).toString('base64url')}`;
+    return `${username}_${generateApiKeyPart(API_KEY_PART_LENGTH)}`;
 };
 
 // Generate CAPTCHA challenge
@@ -205,7 +221,7 @@ router.post('/register', async (req, res) => {
         const plainApiKey = generateUserApiKey(normalizedUsername);
         const apiKeyHash = hashPassword(plainApiKey);
         const keyPrefix = plainApiKey.slice(0, 16);
-        await dbService.createUserApiKey(userId, keyPrefix, apiKeyHash, 'default');
+        await dbService.createUserApiKey(userId, keyPrefix, apiKeyHash, 'default', plainApiKey);
 
         // Auto login after registration
         const user = await dbService.getUserById(userId);
