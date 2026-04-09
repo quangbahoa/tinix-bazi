@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { solarToLunar } from '../../utils/lunarCalendar';
+import { DEFAULT_TIME_ZONE, normalizeTimeZone } from '../../utils/timezoneUtils';
 
-const DatePicker = ({ value, onChange, onClose }) => {
+const DatePicker = ({ value, onChange, onClose, timeZone }) => {
     const [viewDate, setViewDate] = useState(() => {
         return {
             year: value?.year || 1990,
@@ -16,6 +17,7 @@ const DatePicker = ({ value, onChange, onClose }) => {
         month: value?.month || 6,
         day: value?.day || 15
     };
+    const selectedTimeZone = normalizeTimeZone(timeZone || value?.timeZone, DEFAULT_TIME_ZONE);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -47,7 +49,7 @@ const DatePicker = ({ value, onChange, onClose }) => {
             days.push(null);
         }
         for (let d = 1; d <= daysInMonth; d++) {
-            const lunar = solarToLunar(y, month, d);
+            const lunar = solarToLunar(y, month, d, selectedTimeZone);
             days.push({
                 solar: d,
                 lunar: lunar.day,

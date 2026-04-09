@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 
 const AuthModal = ({ onClose, onSuccess }) => {
     const [mode, setMode] = useState('login'); // login or register
-    const [email, setEmail] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
@@ -20,9 +20,9 @@ const AuthModal = ({ onClose, onSuccess }) => {
 
         try {
             if (mode === 'login') {
-                await login(email, password);
+                await login(identifier, password);
             } else {
-                await register(email, password, name, username, inviteCode);
+                await register(identifier, password, name, username, inviteCode);
             }
             onSuccess?.();
             onClose();
@@ -97,14 +97,15 @@ const AuthModal = ({ onClose, onSuccess }) => {
                     )}
 
                     <div className="form-group">
-                        <label>Email</label>
+                        <label>{mode === 'login' ? 'Email hoặc Username' : 'Email'}</label>
                         <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="email@example.com"
+                            type="text"
+                            value={identifier}
+                            onChange={(e) => setIdentifier(e.target.value)}
+                            placeholder={mode === 'login' ? 'email@example.com hoặc username' : 'email@example.com'}
                             className="glass-input"
                             required
+                            autoComplete={mode === 'login' ? 'username' : 'email'}
                         />
                     </div>
 

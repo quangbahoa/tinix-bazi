@@ -4,6 +4,17 @@ const baziService = require('../services/bazi.service');
 const dbService = require('../services/database.service');
 const ganzhi = require('../bazi/ganzhi');
 const authRoutes = require('./auth.routes');
+const DEFAULT_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+
+function normalizeTimeZone(timeZone) {
+    if (!timeZone || typeof timeZone !== 'string') return DEFAULT_TIME_ZONE;
+    try {
+        Intl.DateTimeFormat(undefined, { timeZone });
+        return timeZone;
+    } catch {
+        return DEFAULT_TIME_ZONE;
+    }
+}
 
 // Protect only BaZi endpoints in this router (avoid affecting /api/auth/*).
 router.use([
@@ -33,16 +44,18 @@ router.use([
  */
 router.get('/analyze', async (req, res) => {
     try {
-        const { year, month, day, hour = 12, minute = 0, gender = 'Nam', calendar = 'solar', name = '' } = req.query;
+        const { year, month, day, hour = 12, minute = 0, gender = 'Nam', calendar = 'solar', name = '', timeZone } = req.query;
 
         if (!year || !month || !day) {
             return res.status(400).json({ error: 'Missing required parameters: year, month, day' });
         }
 
+        const normalizedTimeZone = normalizeTimeZone(timeZone);
+
         // Save customer to database (every request = new customer)
         let customerId = null;
         try {
-            customerId = dbService.createNewCustomer({
+            customerId = await dbService.createNewCustomer({
                 name: name || 'Mệnh chủ',
                 year: parseInt(year),
                 month: parseInt(month),
@@ -50,7 +63,8 @@ router.get('/analyze', async (req, res) => {
                 hour: parseInt(hour),
                 minute: parseInt(minute),
                 gender,
-                calendar
+                calendar,
+                timeZone: normalizedTimeZone
             });
             console.log(`[DB] New customer #${customerId} created`);
         } catch (dbError) {
@@ -65,7 +79,8 @@ router.get('/analyze', async (req, res) => {
             minute: parseInt(minute),
             gender,
             calendar,
-            name
+            name,
+            timeZone: normalizedTimeZone
         });
 
         // Include customerId in response

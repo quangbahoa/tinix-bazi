@@ -58,7 +58,7 @@ class DatabaseService {
                     console.error(err);
                     reject(err);
                 } else {
-                    resolve({ id: this.lastID, changes: this.changes });
+                    resolve({ id: this.lastID, lastID: this.lastID, changes: this.changes });
                 }
             });
         });
@@ -97,6 +97,24 @@ class DatabaseService {
     }
 
     /**
+     * Close sqlite connection gracefully
+     */
+    close() {
+        return new Promise((resolve, reject) => {
+            if (!this.db) return resolve();
+            this.db.close((err) => {
+                if (err) {
+                    console.error('[DB] Error closing database:', err.message);
+                    return reject(err);
+                }
+                this.db = null;
+                console.log('[DB] Database connection closed.');
+                resolve();
+            });
+        });
+    }
+
+    /**
      * Create tables if they don't exist
      */
     async createTables() {
@@ -112,10 +130,18 @@ class DatabaseService {
                 minute INTEGER DEFAULT 0,
                 gender TEXT DEFAULT 'Nam',
                 calendar TEXT DEFAULT 'solar',
+                time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `);
+
+        // customers.time_zone migration for old databases
+        const customerColumns = await this.all(`PRAGMA table_info(customers)`);
+        const hasTimeZoneColumn = customerColumns.some((col) => col.name === 'time_zone');
+        if (!hasTimeZoneColumn) {
+            await this.run(`ALTER TABLE customers ADD COLUMN time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh'`);
+        }
 
         // Consultations table - Expanded with detailed context
         await this.run(`
@@ -472,7 +498,7 @@ class DatabaseService {
      * Find or create a customer based on birth info
      */
     async findOrCreateCustomer(userData) {
-        const { name, year, month, day, hour, minute, gender, calendar } = userData;
+        const { name, year, month, day, hour, minute, gender, calendar, timeZone } = userData;
 
         const existing = await this.get(`
             SELECT id FROM customers 
@@ -489,9 +515,9 @@ class DatabaseService {
 
         const safeName = name || 'Mệnh chủ';
         const result = await this.run(`
-            INSERT INTO customers (name, year, month, day, hour, minute, gender, calendar)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `, [safeName, year, month, day, hour || 12, minute || 0, gender || 'Nam', calendar || 'solar']);
+            INSERT INTO customers (name, year, month, day, hour, minute, gender, calendar, time_zone)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [safeName, year, month, day, hour || 12, minute || 0, gender || 'Nam', calendar || 'solar', timeZone || 'Asia/Ho_Chi_Minh']);
 
         console.log(`[DB] Customer #${result.id} created`);
         return result.id;
@@ -501,13 +527,13 @@ class DatabaseService {
      * Always create a new customer record
      */
     async createNewCustomer(userData) {
-        const { name, year, month, day, hour, minute, gender, calendar } = userData;
+        const { name, year, month, day, hour, minute, gender, calendar, timeZone } = userData;
         const safeName = name || 'Mệnh chủ';
 
         const result = await this.run(`
-            INSERT INTO customers (name, year, month, day, hour, minute, gender, calendar)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `, [safeName, year, month, day, hour || 12, minute || 0, gender || 'Nam', calendar || 'solar']);
+            INSERT INTO customers (name, year, month, day, hour, minute, gender, calendar, time_zone)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [safeName, year, month, day, hour || 12, minute || 0, gender || 'Nam', calendar || 'solar', timeZone || 'Asia/Ho_Chi_Minh']);
 
         return result.id;
     }
@@ -1207,7 +1233,7 @@ class DatabaseService {
             INSERT INTO article_categories (name, slug, description, order_index)
             VALUES (?, ?, ?, ?)
         `, [data.name, data.slug, data.description || '', data.order_index || 0]);
-        return result.lastID;
+        return result.id;
     }
 
     async getArticles(options = {}) {
@@ -1288,7 +1314,7 @@ class DatabaseService {
             data.is_published !== undefined ? (data.is_published ? 1 : 0) : 1,
             data.is_featured ? 1 : 0
         ]);
-        return result.lastID;
+        return result.id;
     }
 
     async updateArticle(id, data) {

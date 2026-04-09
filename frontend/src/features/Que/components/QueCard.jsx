@@ -3,6 +3,7 @@ import GuaSymbol from './GuaSymbol';
 
 const QueCard = ({ title, type, icon, data, onRequest, onSelect, onReroll, loading, disabled, isGuest, topic }) => {
     const hasData = !!data && !data.error;
+    const interaction = data?.interaction || {};
 
     const handleClick = useCallback(() => {
         if (!hasData && !loading && !disabled) {
@@ -84,16 +85,16 @@ const QueCard = ({ title, type, icon, data, onRequest, onSelect, onReroll, loadi
 
                             <div className="result-interaction">
                                 <span className="interaction-label">
-                                    {data.interaction?.dayMaster} ({data.interaction?.dayMasterElement})
-                                    <span className={`relation-badge ${data.interaction?.relationType}`}>
-                                        {data.interaction?.relation}
+                                    {(interaction.dayMaster || 'Nhật chủ')} ({interaction.dayMasterElement || 'N/A'})
+                                    <span className={`relation-badge ${interaction.relationType || 'neutral'}`}>
+                                        {interaction.relation || 'Quan hệ chưa xác định'}
                                     </span>
-                                    {data.interaction?.timeGan}{data.interaction?.timeZhi}
+                                    {interaction.timeGan || ''}{interaction.timeZhi || ''}
                                 </span>
                             </div>
 
                             <div className="result-footer">
-                                <span>🎯 Thập Thần: {data.interaction?.activatedShiShen}</span>
+                                <span>🎯 Thập Thần: {interaction.activatedShiShen || 'Đang cập nhật'}</span>
                                 <small>Bấm để xem chi tiết bên dưới</small>
                             </div>
 

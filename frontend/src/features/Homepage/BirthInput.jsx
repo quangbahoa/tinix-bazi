@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import Select from 'react-select';
 import QuickDivination from './QuickDivination';
 
 import DatePicker from './DatePicker';
@@ -8,6 +9,12 @@ import UserProfileModal from '../../components/UserProfileModal';
 import AuthModal from '../../components/AuthModal';
 import { useAuth } from '../../context/AuthContext';
 import { API_CONFIG } from '../../config/api';
+import {
+    buildTimeZoneOptions,
+    groupTimeZonesByContinent,
+    DEFAULT_TIME_ZONE,
+    normalizeTimeZone
+} from '../../utils/timezoneUtils';
 
 const DEFAULT_FORM_DATA = {
     name: '',
@@ -17,8 +24,35 @@ const DEFAULT_FORM_DATA = {
     day: 15,
     hour: 10,
     minute: 0,
-    calendar: 'solar'
+    calendar: 'solar',
+    timeZone: DEFAULT_TIME_ZONE
 };
+
+const GENDER_OPTIONS = [
+    { value: 'Nam', label: 'Nam Mệnh' },
+    { value: 'Nữ', label: 'Nữ Mệnh' }
+];
+
+const HOUR_OPTIONS = [
+    { value: 0, label: 'Tý (子) • 23:00 - 01:00' },
+    { value: 1, label: 'Sửu (丑) • 01:00 - 03:00' },
+    { value: 3, label: 'Dần (寅) • 03:00 - 05:00' },
+    { value: 5, label: 'Mão (卯) • 05:00 - 07:00' },
+    { value: 7, label: 'Thìn (辰) • 07:00 - 09:00' },
+    { value: 9, label: 'Tỵ (巳) • 09:00 - 11:00' },
+    { value: 11, label: 'Ngọ (午) • 11:00 - 13:00' },
+    { value: 13, label: 'Mùi (未) • 13:00 - 15:00' },
+    { value: 15, label: 'Thân (申) • 15:00 - 17:00' },
+    { value: 17, label: 'Dậu (酉) • 17:00 - 19:00' },
+    { value: 19, label: 'Tuất (戌) • 19:00 - 21:00' },
+    { value: 21, label: 'Hợi (亥) • 21:00 - 23:00' }
+];
+
+const normalizeSearchText = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
 const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
     const { user, token, isAuthenticated, logout, refreshUser } = useAuth();
@@ -39,7 +73,12 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
         const savedForm = sessionStorage.getItem('homepage_form_data');
         if (savedForm) {
             try {
-                return JSON.parse(savedForm);
+                const parsed = JSON.parse(savedForm);
+                return {
+                    ...DEFAULT_FORM_DATA,
+                    ...parsed,
+                    timeZone: normalizeTimeZone(parsed?.timeZone, DEFAULT_TIME_ZONE)
+                };
             } catch (e) {
                 console.error('Failed to parse saved form data:', e);
             }
@@ -68,7 +107,8 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
             if (!hasSavedName) {
                 setFormData(prev => ({
                     ...prev,
-                    ...user.bazi_data
+                    ...user.bazi_data,
+                    timeZone: normalizeTimeZone(user?.bazi_data?.timeZone, DEFAULT_TIME_ZONE)
                 }));
             }
             sessionStorage.setItem('homepage_form_initialized', 'true');
@@ -133,7 +173,8 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                             minute: formData.minute || 0,
                             gender: formData.gender,
                             calendar: formData.calendar || 'solar',
-                            name: formData.name
+                            name: formData.name,
+                            timeZone: normalizeTimeZone(formData.timeZone, DEFAULT_TIME_ZONE)
                         }
                     })
                 });
@@ -147,7 +188,10 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
             }
         }
 
-        onAnalyze(formData);
+        onAnalyze({
+            ...formData,
+            timeZone: normalizeTimeZone(formData.timeZone, DEFAULT_TIME_ZONE)
+        });
     };
 
     const formatSelectedDate = () => {
@@ -156,6 +200,21 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
         const weekday = weekdays[date.getDay()];
         return `${weekday}, ${formData.day}/${formData.month}/${formData.year}`;
     };
+
+    const timeZoneOptions = useMemo(() => {
+        return buildTimeZoneOptions().map((option) => ({
+            ...option,
+            searchText: normalizeSearchText(`${option.countryLabel} ${option.value}`)
+        }));
+    }, []);
+
+    const groupedTimeZoneOptions = useMemo(() => {
+        return groupTimeZonesByContinent(timeZoneOptions);
+    }, [timeZoneOptions]);
+
+    const selectedTimeZoneOption = useMemo(() => {
+        return timeZoneOptions.find((item) => item.value === formData.timeZone) || null;
+    }, [timeZoneOptions, formData.timeZone]);
 
     return (
         <div className="input-form-container fade-in">
@@ -198,7 +257,8 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                                             day: user.bazi_data.day,
                                             hour: user.bazi_data.hour || 10,
                                             minute: user.bazi_data.minute || 0,
-                                            calendar: user.bazi_data.calendar || 'solar'
+                                            calendar: user.bazi_data.calendar || 'solar',
+                                            timeZone: normalizeTimeZone(user?.bazi_data?.timeZone, DEFAULT_TIME_ZONE)
                                         };
                                         const { apiClient } = await import('../../services/apiClient');
                                         const result = await apiClient.analyze(params);
@@ -287,13 +347,38 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
 
                     <div className="input-group">
                         <label>Giới tính</label>
-                        <select name="gender" value={formData.gender} onChange={handleChange} className="glass-input">
-                            <option value="Nam">Nam Mệnh</option>
-                            <option value="Nữ">Nữ Mệnh</option>
-                        </select>
+                        <Select
+                            classNamePrefix="tz-select"
+                            className="tz-react-select"
+                            options={GENDER_OPTIONS}
+                            value={GENDER_OPTIONS.find((item) => item.value === formData.gender) || GENDER_OPTIONS[0]}
+                            onChange={(option) => setFormData((prev) => ({ ...prev, gender: option?.value || 'Nam' }))}
+                            isSearchable={false}
+                        />
                     </div>
 
-                    <div className="input-group date-picker-trigger-group" style={{ gridColumn: 'span 2' }}>
+                    <div className="input-group timezone-input-group">
+                        <label>Múi giờ</label>
+                        <Select
+                            classNamePrefix="tz-select"
+                            className="tz-react-select"
+                            options={groupedTimeZoneOptions}
+                            value={selectedTimeZoneOption}
+                            onChange={(option) => setFormData((prev) => ({ ...prev, timeZone: option?.value || DEFAULT_TIME_ZONE }))}
+                            isSearchable
+                            placeholder="Tìm quốc gia hoặc timezone..."
+                            formatGroupLabel={(group) => (
+                                <div className="tz-group-label">{group.label}</div>
+                            )}
+                            filterOption={(option, inputValue) => {
+                                const keyword = normalizeSearchText(inputValue);
+                                if (!keyword) return true;
+                                return option.data.searchText?.includes(keyword);
+                            }}
+                        />
+                    </div>
+
+                    <div className="input-group date-picker-trigger-group">
                         <label>Ngày sinh (Dương lịch)</label>
                         <button
                             type="button"
@@ -305,28 +390,24 @@ const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
                         {showDatePicker && (
                             <DatePicker
                                 value={formData}
+                                timeZone={formData.timeZone}
                                 onChange={handleDatePickerChange}
                                 onClose={() => setShowDatePicker(false)}
                             />
                         )}
                     </div>
 
-                    <div className="input-group tooltip-wrapper full-width">
+                    <div className="input-group tooltip-wrapper">
                         <label>Giờ sinh</label>
-                        <select name="hour" value={formData.hour} onChange={handleChange} className="glass-input">
-                            <option value={0}>Tý (子) • 23:00 - 01:00</option>
-                            <option value={1}>Sửu (丑) • 01:00 - 03:00</option>
-                            <option value={3}>Dần (寅) • 03:00 - 05:00</option>
-                            <option value={5}>Mão (卯) • 05:00 - 07:00</option>
-                            <option value={7}>Thìn (辰) • 07:00 - 09:00</option>
-                            <option value={9}>Tỵ (巳) • 09:00 - 11:00</option>
-                            <option value={11}>Ngọ (午) • 11:00 - 13:00</option>
-                            <option value={13}>Mùi (未) • 13:00 - 15:00</option>
-                            <option value={15}>Thân (申) • 15:00 - 17:00</option>
-                            <option value={17}>Dậu (酉) • 17:00 - 19:00</option>
-                            <option value={19}>Tuất (戌) • 19:00 - 21:00</option>
-                            <option value={21}>Hợi (亥) • 21:00 - 23:00</option>
-                        </select>
+                        <Select
+                            classNamePrefix="tz-select"
+                            className="tz-react-select"
+                            options={HOUR_OPTIONS}
+                            value={HOUR_OPTIONS.find((item) => item.value === formData.hour) || HOUR_OPTIONS[0]}
+                            onChange={(option) => setFormData((prev) => ({ ...prev, hour: Number(option?.value ?? 10) }))}
+                            isSearchable={false}
+                        />
+                        <small className="input-hint">Ngày giờ sinh được hiểu theo múi giờ đã chọn.</small>
                     </div>
                 </div>
 

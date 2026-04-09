@@ -77,6 +77,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    direction: ltr;
+    unicode-bidi: normal;
 }
 
 /* Front Face */
@@ -101,6 +105,11 @@
     z-index: 2;
     text-align: center;
     padding: 1rem;
+    transform: translateZ(1px);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    direction: ltr;
+    unicode-bidi: normal;
 }
 
 .card-icon {
@@ -114,6 +123,9 @@
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;
+    transform: none;
+    direction: ltr;
+    unicode-bidi: normal;
 }
 
 .card-status {
@@ -123,6 +135,9 @@
     gap: 0.5rem;
     padding: 0.8rem 1.5rem;
     border-radius: 50px;
+    transform: none;
+    direction: ltr;
+    unicode-bidi: normal;
 }
 
 .status-available {

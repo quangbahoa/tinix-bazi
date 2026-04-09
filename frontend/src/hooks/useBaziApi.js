@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../services/apiClient';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { DEFAULT_TIME_ZONE, normalizeTimeZone } from '../utils/timezoneUtils';
 
 export const useBaziApi = () => {
     // Initialize from sessionStorage to prevent flash/redirect on F5
@@ -65,7 +66,8 @@ export const useBaziApi = () => {
                 day: parseInt(day),
                 hour: parseInt(searchParams.get('hour') || '12'),
                 minute: parseInt(searchParams.get('minute') || '0'),
-                calendar: searchParams.get('calendar') || 'solar'
+                calendar: searchParams.get('calendar') || 'solar',
+                timeZone: normalizeTimeZone(searchParams.get('timeZone'), DEFAULT_TIME_ZONE)
             };
             analyze(params, false);
         }
