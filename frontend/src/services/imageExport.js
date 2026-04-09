@@ -30,7 +30,7 @@ const createHTMLContent = (data) => {
         position: fixed; top: 0; left: -9999px;
         width: 820px; padding: 0;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-        font-family: 'Be Vietnam Pro', 'Segoe UI', Arial, sans-serif;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
         color: #fff;
     `;
 

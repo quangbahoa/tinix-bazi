@@ -1,4 +1,4 @@
-/* Fonts loaded via index.html */
+/* System font stacks (--font-primary / --font-accent) */
 
 :root {
   --bg-dark: #08080a;
@@ -30,7 +30,7 @@
     "Malgun Gothic",
     "Apple SD Gothic Neo",
     sans-serif;
-  --font-accent: 'Montserrat', 'Be Vietnam Pro', sans-serif;
+  --font-accent: var(--font-primary);
   
   --element-wood: #45c073;
   --element-fire: #e56b6b;
@@ -11148,7 +11148,7 @@ a.category-card {
 }
 
 .mystical-welcome-text {
-  font-family: 'Lora', serif;
+  font-family: var(--font-primary);
   font-size: 1.4rem;
   font-style: italic;
   font-weight: 500;
@@ -12143,7 +12143,7 @@ a.category-card {
 .mini-brand,
 .brand-title {
   position: relative;
-  font-family: 'Be Vietnam Pro', serif;
+  font-family: var(--font-primary);
   font-weight: 500;
   text-transform: uppercase;
   background: linear-gradient(to right,

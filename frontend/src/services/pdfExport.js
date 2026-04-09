@@ -76,7 +76,7 @@ const createPDFContent = (data, options) => {
         position: fixed; top: 0; left: -9999px;
         width: 800px; padding: 20px;
         background: #0a0a0a;
-        font-family: 'Be Vietnam Pro', 'Inter', Arial, sans-serif;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
         color: #fff;
     `;
 

@@ -49,15 +49,25 @@ const authLimiter = rateLimit({
 });
 
 // Middleware
-app.use(helmet());
+const cspDirectives = () => {
+    const d = { ...helmet.contentSecurityPolicy.getDefaultDirectives() };
+    const cfOn = ['1', 'true', 'yes'].includes(String(process.env.CLOUDFLARE_ANALYTICS || '').trim().toLowerCase());
+    if (cfOn) {
+        d['script-src'] = [...d['script-src'], 'https://static.cloudflareinsights.com'];
+        d['connect-src'] = ["'self'", 'https://cloudflareinsights.com'];
+    }
+    return d;
+};
+
+app.use(helmet({
+    contentSecurityPolicy: { directives: cspDirectives() }
+}));
 app.use(compression());
 app.use(cors());
 app.use(express.json({ limit: '5mb' })); // Increased limit for large chart data
 app.use(generalLimiter); // Apply general rate limit to all routes
 
 app.set('trust proxy', parseTrustProxy());
-// Trust proxy for real IP behind Nginx/Cloudflare
-app.set('trust proxy', false);
 
 const skipAccessDbLog = (rawUrl) => {
     const pathOnly = (rawUrl || '').split('?')[0];

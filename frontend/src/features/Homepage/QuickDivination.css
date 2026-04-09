@@ -16,7 +16,7 @@
 }
 
 .quick-title {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-primary);
     font-size: 0.9rem;
     color: var(--gold-primary, #d4af37);
     margin: 0 0 4px 0;
@@ -236,7 +236,7 @@
     font-size: 0.75rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-primary);
     letter-spacing: 0.5px;
 }
 
@@ -410,7 +410,7 @@
     margin-top: 2rem;
     color: var(--gold-primary, #d4af37);
     font-size: 1rem;
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-primary);
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
     letter-spacing: 2px;
     animation: textFlicker 3s infinite;
