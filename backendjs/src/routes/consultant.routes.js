@@ -177,8 +177,9 @@ router.post('/ask', authRoutes.authMiddleware, aiLimiter, async (req, res) => {
             }
         }
 
-        // Check if AI mode is requested
-        if (useAI) {
+        // AI mode defaults to true for this endpoint
+        const aiRequested = useAI !== false;
+        if (aiRequested) {
             // Prepare full context for AI
             const fullOutput = formatOutput(ctx);
             const daiVanData = calculateDaiVan(ctx);
@@ -264,7 +265,7 @@ router.post('/ask', authRoutes.authMiddleware, aiLimiter, async (req, res) => {
                 questionId,
                 finalQuestionText,
                 answerData.answer,
-                !!useAI,
+                !!aiRequested,
                 creditCost,
                 userId,  // Pass user ID
                 persona || 'huyen_co', // Pass persona
@@ -298,7 +299,7 @@ router.post('/ask', authRoutes.authMiddleware, aiLimiter, async (req, res) => {
             questionId,
             answer: answerData.answer,
             followUps: answerData.followUps,
-            useAI: !!useAI,
+            useAI: !!aiRequested,
             persona: persona || 'huyen_co',
             customerId,
             consultationId,
@@ -390,10 +391,11 @@ router.get('/my-history', authRoutes.authMiddleware, async (req, res) => {
 const CREDIT_COST_COMPREHENSIVE = 25;
 router.post('/comprehensive', authRoutes.authMiddleware, aiLimiter, async (req, res) => {
     try {
-        const { chartData, persona } = req.body;
+        const { chartData, chartDataLite, persona } = req.body;
         const userId = req.user.id;
 
-        if (!chartData) {
+        const effectiveChartData = chartDataLite || chartData;
+        if (!effectiveChartData) {
             return res.status(400).json({ error: 'Thiếu dữ liệu lá số' });
         }
 
@@ -412,19 +414,8 @@ router.post('/comprehensive', authRoutes.authMiddleware, aiLimiter, async (req, 
         // Build comprehensive prompt from chart data
         const personaName = persona === 'menh_meo' ? 'Tù trưởng Bường A Lỏ' : 'Thầy Quảng';
         const personaStyle = persona === 'menh_meo'
-            ? `Hãy dùng ngôn ngữ Gen Z, hài hước, vui vẻ, NHIỀU EMOJI trong mỗi đoạn văn. 
-- Gọi người hỏi là "con", "bồ", hoặc "cưng"
-- Dùng các từ lóng như: "chill", "vibe", "flex", "slay", "real", "cap", "no cap", "đu trend", "xịn xò", "đỉnh của chóp", "so chill", "tuổi gì đây trời", "quẩy lên"
-- Ví von bằng pop culture: "như Blackpink", "energy như Sơn Tùng", "drama như Bà Nguyễn Phương Hằng"
-- Đưa ra lời khuyên theo kiểu GenZ: "Cứ chill thôi", "Đừng overthink nhiều quá", "Slay thôi nào"
-- Khi nói về bát tự, giải thích đơn giản, dễ hiểu như đang giải thích cho bạn bè
-- Mỗi section nên có ít nhất 1-2 emoji phù hợp`
-            : `Hãy dùng ngôn ngữ trang trọng, uyên thâm, đầy chiêm nghiệm Đông phương.
-- Gọi người hỏi là "con" hoặc "Mệnh chủ"
-- Trích dẫn kinh điển khi phù hợp (Kinh Dịch, Luận Ngữ, Đạo Đức Kinh)
-- Dùng từ ngữ cổ kính: "nghiệm rằng", "xét thấy", "lý giải", "vốn dĩ", "cổ nhân có câu"
-- Giải thích chi tiết về bát tự, mệnh lý học, ngũ hành tương sinh tương khắc
-- Lời khuyên mang tính triết lý sâu sắc`;
+            ? `Phong cách GenZ hài hước vừa phải, gần gũi, có thể dùng emoji nhưng không lạm dụng.`
+            : `Phong cách trang trọng, điềm đạm, ngôn ngữ sáng rõ, thiên về tư vấn thực tế.`;
 
         // Current time for context
         const now = new Date();
@@ -434,10 +425,10 @@ router.post('/comprehensive', authRoutes.authMiddleware, aiLimiter, async (req, 
         const currentTimeStr = `${currentDay}/${currentMonth}/${currentYear}`;
 
         // Extract key data from chartData - use actual structure from formatOutput()
-        const basicInfo = chartData.thong_tin_co_ban || chartData.thong_tin || {};
+        const basicInfo = effectiveChartData.thong_tin_co_ban || effectiveChartData.thong_tin || {};
 
         // chi_tiet_tru is an ARRAY [yearPillar, monthPillar, dayPillar, hourPillar]
-        const chiTietTru = chartData.chi_tiet_tru || [];
+        const chiTietTru = effectiveChartData.chi_tiet_tru || [];
         const yearPillar = chiTietTru[0] || {};
         const monthPillar = chiTietTru[1] || {};
         const dayPillar = chiTietTru[2] || {};
@@ -445,8 +436,8 @@ router.post('/comprehensive', authRoutes.authMiddleware, aiLimiter, async (req, 
 
         // Day master info from dayPillar
         const dayMaster = dayPillar.can || 'Chưa xác định';
-        const dayMasterElement = dayPillar.hanh_can || (chartData.phan_tich?.can_bang_ngu_hanh?.nhat_chu_hanh || 'Chưa xác định');
-        const dayMasterStrength = chartData.phan_tich?.can_bang_ngu_hanh?.nhan_dinh?.cuong_do || 'Cần phân tích thêm';
+        const dayMasterElement = dayPillar.hanh_can || (effectiveChartData.phan_tich?.can_bang_ngu_hanh?.nhat_chu_hanh || 'Chưa xác định');
+        const dayMasterStrength = effectiveChartData.phan_tich?.can_bang_ngu_hanh?.nhan_dinh?.cuong_do || 'Cần phân tích thêm';
 
         // Get thập thần from each pillar
         const shiShen = {
@@ -466,10 +457,10 @@ router.post('/comprehensive', authRoutes.authMiddleware, aiLimiter, async (req, 
             ...(hourPillar.than_sat || []).map(s => `Giờ: ${s}`)
         ];
 
-        const luckyElements = chartData.phan_tich?.can_bang_ngu_hanh?.dung_than?.ngu_hanh || [];
-        const avoidElements = chartData.phan_tich?.can_bang_ngu_hanh?.ky_than?.ngu_hanh || [];
-        const daiVan = chartData.dai_van || [];
-        const elementScores = chartData.diem_so || {};
+        const luckyElements = effectiveChartData.phan_tich?.can_bang_ngu_hanh?.dung_than?.ngu_hanh || [];
+        const avoidElements = effectiveChartData.phan_tich?.can_bang_ngu_hanh?.ky_than?.ngu_hanh || [];
+        const daiVan = effectiveChartData.dai_van || [];
+        const elementScores = effectiveChartData.diem_so || {};
 
         // Format Tứ Trụ from chi_tiet_tru array
         const formatPillarFromObj = (p) => {
@@ -515,37 +506,34 @@ router.post('/comprehensive', authRoutes.authMiddleware, aiLimiter, async (req, 
         const monthNames = ['', 'Tháng Giêng', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư', 'Tháng Năm', 'Tháng Sáu',
             'Tháng Bảy', 'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Chạp'];
 
-        const prompt = `Bạn là ${personaName}, một chuyên gia Bát Tự (Tử Vi).
+        const prompt = `Bạn là ${personaName}, chuyên gia Bát Tự.
 ${personaStyle}
 
 THỜI ĐIỂM HIỆN TẠI: ${currentTimeStr} (Năm ${currentYear}, ${monthNames[currentMonth]})
 NGÀY MAI: ${tomorrowStr}
 THÁNG SAU: ${monthNames[nextMonth]} năm ${nextMonthYear}
 
-Hãy tổng hợp và luận giải đầy đủ lá số Bát Tự sau đây. Bao gồm:
+Hãy viết bản tổng hợp luận giải rõ ràng, có chiều sâu, theo cấu trúc:
 
 **PHẦN 1: PHÂN TÍCH BẢN MỆNH**
-1. Tổng quan về Nhật chủ (bản mệnh) - giải thích chi tiết Tứ Trụ
-2. Phân tích tính cách, ưu điểm, nhược điểm
-3. Phân tích sự nghiệp và tài lộc
-4. Phân tích tình duyên và gia đạo
-5. Phân tích sức khỏe cần lưu ý
-6. Các sao thần sát quan trọng và ý nghĩa
+1. Tổng quan Nhật chủ và Tứ Trụ (ý chính)
+2. Tính cách, ưu/nhược điểm nổi bật
+3. Sự nghiệp - tài lộc
+4. Tình cảm - gia đạo
+5. Sức khỏe cần lưu ý
 
 **PHẦN 2: DỰ BÁO THEO THỜI GIAN**
-7. Vận hạn NGÀY MAI (${tomorrowStr}) - điều cần lưu ý, nên làm gì, tránh gì
-8. Vận hạn THÁNG NÀY (${monthNames[currentMonth]} ${currentYear}) - xu hướng chung, cơ hội, thách thức
-9. Vận hạn THÁNG SAU (${monthNames[nextMonth]} ${nextMonthYear}) - dự báo và chuẩn bị
-10. Tổng quan NĂM ${currentYear} - Đại vận hiện tại và lời khuyên
+6. Ngày mai (${tomorrowStr}) - nên làm/tránh
+7. Tháng này và tháng sau - cơ hội, rủi ro, cách chuẩn bị
+8. Tổng quan năm ${currentYear} theo đại vận hiện tại
 
 **PHẦN 3: HƯỚNG DẪN THỰC HÀNH**
-11. Vật phẩm phong thủy, màu sắc may mắn, hướng tốt
+9. Màu sắc, thói quen, hướng hành động phù hợp
 
 LƯU Ý QUAN TRỌNG VỀ TRÌNH BÀY:
-- Không sử dụng quá nhiều ký tự markdown đặc biệt.
-- Sử dụng in đậm (**) một cách tiết chế, chỉ dùng cho các từ khóa hoặc ý cực kỳ quan trọng. Không bôi đậm cả câu dài.
-- Trình bày rõ ràng, ngắt đoạn hợp lý.
-- Luôn giữ đúng phong cách (persona) đã chọn.
+- Trình bày dễ đọc, ngắt đoạn hợp lý.
+- Không dùng code block.
+- Không nhắc đến AI/prompt/hệ thống.
 
 THÔNG TIN LÁ SỐ:
 - Họ tên: ${basicInfo.ten || basicInfo.name || 'Mệnh chủ'}
@@ -576,13 +564,10 @@ ${shenShaStr}
 ĐẠI VẬN HIỆN TẠI VÀ SẮP TỚI:
 ${daiVanStr}
 
-LƯU Ý QUAN TRỌNG: 
-- Nếu có thông tin nào chưa có dữ liệu, hãy bỏ qua phần đó hoặc đưa ra nhận định dựa trên các thông tin khác có sẵn. 
-- KHÔNG được để các placeholder như [X] trong câu trả lời.
-- Phải luận giải chi tiết về TỨ TRỤ, giải thích ý nghĩa của từng trụ (Năm, Tháng, Ngày, Giờ).
-- Đề cập cụ thể các Can Chi và ngũ hành tương ứng trong bản mệnh.
-
-Hãy viết một bản luận giải đầy đủ, chi tiết, có tổ chức rõ ràng, dài khoảng 800-1200 từ. Điền đầy đủ các thông tin cụ thể, không để trống.
+LƯU Ý:
+- Nếu thiếu dữ liệu thì bỏ qua phần đó, không dùng placeholder.
+- Luận giải bám dữ liệu thực tế đã cho.
+- Độ dài mục tiêu: khoảng 600-900 từ.
 
 CUỐI CÙNG, hãy gợi ý 3-5 câu hỏi mà người dùng có thể muốn hỏi thêm. Viết theo format:
 ---GỢI Ý CÂU HỎI---
@@ -593,7 +578,9 @@ CUỐI CÙNG, hãy gợi ý 3-5 câu hỏi mà người dùng có thể muốn h
 5. [Câu hỏi 5 - tùy chọn]`;
 
         // Call OpenRouter API
-        const rawResponse = await openRouterService.generateCompletion(prompt, persona);
+        const rawResponse = await openRouterService.generateCompletion(prompt, persona, {
+            endpoint: 'consultant.comprehensive'
+        });
 
         // Parse response to separate interpretation from follow-up questions
         let interpretation = rawResponse;
@@ -614,7 +601,7 @@ CUỐI CÙNG, hãy gợi ý 3-5 câu hỏi mà người dùng có thể muốn h
 
         // Save to consultation history
         try {
-            let customerId = chartData.customerId;
+            let customerId = effectiveChartData.customerId;
 
             if (!customerId) {
                 // Try to reconstruct customer info if missing ID

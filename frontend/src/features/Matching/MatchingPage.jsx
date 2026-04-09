@@ -345,12 +345,22 @@ const MatchingPage = ({ userData }) => {
         setFollowUpAnswer(null);
 
         try {
+            const buildPayload = (person) => ({
+                name: person?.name || '',
+                year: person?.year,
+                month: person?.month,
+                day: person?.day,
+                hour: person?.hour,
+                minute: person?.minute || 0,
+                gender: person?.gender,
+                calendar: 'solar'
+            });
+
             const data = await apiClient.askAI({
-                ...person1,
-                partnerData: person2,
+                ...buildPayload(person1),
+                partnerData: buildPayload(person2),
                 questionId: 'custom',
                 questionText: question,
-                useAI: true,
                 persona: selectedPersona
             }, token);
 

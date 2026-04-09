@@ -182,7 +182,7 @@ const ConsultantPage = ({ userData }) => {
             return;
         }
         setSelectedQuestion({ id: 'custom', text: customQuestion });
-        await askQuestion(customQuestion, customQuestion);
+        await askQuestion('custom', customQuestion);
     };
 
     const handleAuthSuccess = () => {
@@ -211,6 +211,33 @@ const ConsultantPage = ({ userData }) => {
             setLoadingStage(prev => (prev < 3 ? prev + 1 : prev));
         }, 1500);
 
+        const buildPersonPayload = (person) => ({
+            name: person?.name || '',
+            year: person?.year,
+            month: person?.month,
+            day: person?.day,
+            hour: person?.hour,
+            minute: person?.minute || 0,
+            gender: person?.gender,
+            calendar: person?.calendar || 'solar'
+        });
+
+        const normalizedQuestionId = questionId || 'custom';
+        const isCustomQuestion = normalizedQuestionId === 'custom';
+        const payload = {
+            ...buildPersonPayload(userData),
+            questionId: normalizedQuestionId,
+            persona: selectedPersona
+        };
+
+        if (isCustomQuestion && questionText) {
+            payload.questionText = questionText;
+        }
+
+        if (partnerData) {
+            payload.partnerData = buildPersonPayload(partnerData);
+        }
+
         try {
             const response = await fetch(`${API_BASE}/ask`, {
                 method: 'POST',
@@ -218,14 +245,7 @@ const ConsultantPage = ({ userData }) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    ...userData,
-                    partnerData: partnerData, // Include partner if available
-                    questionId: questionId,
-                    questionText: questionText,
-                    useAI: true,
-                    persona: selectedPersona
-                })
+                body: JSON.stringify(payload)
             });
             const data = await response.json();
 
