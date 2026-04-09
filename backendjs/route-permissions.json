@@ -1,0 +1,65 @@
+{
+  "defaultPermission": "auth",
+  "rules": [
+    { "method": "GET", "pathPattern": "/api/docs", "permission": "public" },
+
+    { "method": "POST", "pathPattern": "/api/auth/register", "permission": "public" },
+    { "method": "POST", "pathPattern": "/api/auth/login", "permission": "public" },
+    { "method": "POST", "pathPattern": "/api/auth/logout", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/auth/me", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/auth/suggestions", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/auth/profile", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/auth/request-credits", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/auth/pending-request", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/auth/captcha", "permission": "public" },
+
+    { "method": "GET", "pathPattern": "/api/users/me", "permission": "auth" },
+
+    { "method": "GET", "pathPattern": "/api/consultant/themes", "permission": "public" },
+    { "method": "GET", "pathPattern": "/api/consultant/questions/*", "permission": "public" },
+    { "method": "GET", "pathPattern": "/api/consultant/recent", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/consultant/history/*", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/consultant/stats", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/consultant/customers", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/consultant/my-history", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/consultant/comprehensive", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/consultant/ask", "permission": "disabled" },
+
+    { "method": "GET", "pathPattern": "/api/articles", "permission": "public" },
+    { "method": "GET", "pathPattern": "/api/articles/categories", "permission": "public" },
+    { "method": "GET", "pathPattern": "/api/articles/*", "permission": "public" },
+    { "method": "GET", "pathPattern": "/api/articles/admin/all", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/articles/seed", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/articles", "permission": "admin" },
+    { "method": "PUT", "pathPattern": "/api/articles/*", "permission": "admin" },
+    { "method": "DELETE", "pathPattern": "/api/articles/*", "permission": "admin" },
+
+    { "method": "GET", "pathPattern": "/api/que/quick-random", "permission": "public" },
+    { "method": "GET", "pathPattern": "/api/que/*", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/que/*", "permission": "auth" },
+
+    { "method": "GET", "pathPattern": "/api/admin/*", "permission": "admin" },
+    { "method": "POST", "pathPattern": "/api/admin/*", "permission": "admin" },
+    { "method": "PUT", "pathPattern": "/api/admin/*", "permission": "admin" },
+    { "method": "DELETE", "pathPattern": "/api/admin/*", "permission": "admin" },
+
+    { "method": "GET", "pathPattern": "/api/analyze", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/chart", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/elements", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/stars", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/luck-cycles", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/year-analysis", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/analyze-time", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/select-dates", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/basic-info", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/scores", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/pillars", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/analysis", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/advanced", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/dayun", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/classic-texts", "permission": "auth" },
+    { "method": "GET", "pathPattern": "/api/luan-giai", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/matching", "permission": "auth" },
+    { "method": "POST", "pathPattern": "/api/matching/ai", "permission": "auth" }
+  ]
+}

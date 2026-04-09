@@ -5,40 +5,34 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
+const rateLimitCfg = require('./src/config/rateLimit.env');
 
 const baziRoutes = require('./src/routes/bazi.routes');
 const consultantRoutes = require('./src/routes/consultant.routes');
 const adminRoutes = require('./src/routes/admin.routes');
 const authRoutes = require('./src/routes/auth.routes');
+const usersRoutes = require('./src/routes/users.routes');
 const articlesRoutes = require('./src/routes/articles.routes');
 const queRoutes = require('./src/routes/que.routes');
+const { routePermissionsMiddleware } = require('./src/middleware/routePermissions');
 // const dailyRoutes = require('./src/routes/daily.routes');
 const dbService = require('./src/services/database.service');
 
 const app = express();
 const PORT = process.env.PORT || 8888;
-
-// Rate limiting configurations
+// Rate limiting (numeric limits from env via src/config/rateLimit.env.js)
 const generalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500, // 500 requests per 15 minutes (increased for dev)
+    windowMs: rateLimitCfg.generalWindowMs,
+    max: rateLimitCfg.generalMax,
     message: { error: 'Quá nhiều request, vui lòng thử lại sau 15 phút' },
     standardHeaders: true,
     legacyHeaders: false,
 });
 
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // Increased to 50 login/register/auth attempts
+    windowMs: rateLimitCfg.authWindowMs,
+    max: rateLimitCfg.authMax,
     message: { error: 'Quá nhiều lần thử đăng nhập, vui lòng thử lại sau 15 phút' },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
-const aiLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 15, // 15 AI requests per minute (increased from 5)
-    message: { error: 'Quá nhiều request AI, vui lòng chờ 1 phút' },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -51,7 +45,7 @@ app.use(express.json({ limit: '5mb' })); // Increased limit for large chart data
 app.use(generalLimiter); // Apply general rate limit to all routes
 
 // Trust proxy for real IP behind Nginx/Cloudflare
-app.set('trust proxy', true);
+app.set('trust proxy', false);
 
 
 // Access logging middleware
@@ -90,10 +84,13 @@ app.use((req, res, next) => {
 });
 
 // Routes
+app.use('/api', routePermissionsMiddleware());
+
 app.use('/api', baziRoutes);
 app.use('/api/consultant', consultantRoutes);  // Removed global aiLimiter, will apply per-route
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authLimiter, authRoutes);  // Strict auth rate limit
+app.use('/api/users', usersRoutes);
 app.use('/api/articles', articlesRoutes);  // Articles routes
 app.use('/api/que', queRoutes);
 // app.use('/api/daily', dailyRoutes);

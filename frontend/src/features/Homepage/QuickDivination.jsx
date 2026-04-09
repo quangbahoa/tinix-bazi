@@ -27,7 +27,14 @@ const QuickDivination = () => {
         const startTime = Date.now();
 
         try {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/que/quick-random?topic=${selectedTopic}`);
+            const authToken = localStorage.getItem('auth_token');
+            if (!authToken) {
+                throw new Error('Vui lòng đăng nhập để xin quẻ.');
+            }
+
+            const response = await fetch(`${API_CONFIG.BASE_URL}/que/quick-random?topic=${selectedTopic}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
 
             if (!response.ok) {
                 throw new Error('Không thể kết nối với thần linh, vui lòng thử lại.');

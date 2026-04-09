@@ -4,11 +4,7 @@ import QuickDivination from './QuickDivination';
 
 import DatePicker from './DatePicker';
 import Toast from '../../components/Toast';
-import RecentCustomers from '../../components/RecentCustomers';
-import SuggestedQuestions from '../../components/SuggestedQuestions';
 import UserProfileModal from '../../components/UserProfileModal';
-import SampleShowcase from '../../components/SampleShowcase';
-import ArticlesSection from '../../components/ArticlesSection';
 import AuthModal from '../../components/AuthModal';
 import { useAuth } from '../../context/AuthContext';
 import { API_CONFIG } from '../../config/api';
@@ -161,8 +157,8 @@ const BirthInput = ({ onAnalyze, loading }) => {
             )}
 
             <header className="branding-header">
-                <h2 className="brand-title">HUYỀN CƠ BÁT TỰ</h2>
-                <p className="brand-tagline">huyencobattu.com • Khám phá mật mã cuộc đời</p>
+                <h2 className="brand-title">VIET LAC SO</h2>
+                <p className="brand-tagline">vietlac.com • Khám phá mật mã cuộc đời</p>
             </header>
 
             {isAuthenticated && user ? (
@@ -320,17 +316,6 @@ const BirthInput = ({ onAnalyze, loading }) => {
             </form>
 
             <QuickDivination />
-
-            <SuggestedQuestions />
-
-
-            <SampleShowcase />
-
-            <ArticlesSection />
-
-            {/* Daily Feature Removed */}
-
-            <RecentCustomers />
 
             {showProfileModal && createPortal(
                 <UserProfileModal

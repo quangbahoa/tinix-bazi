@@ -1,4 +1,4 @@
-# 🏮 Huyền Cơ Bát Tự — BaZi Analysis Platform
+# 🏮 Viet Lac So — BaZi Analysis Platform
 
 > Nền tảng phân tích Tứ Trụ (Bát Tự) chuyên sâu, tích hợp AI tư vấn, được xây dựng với React 19 & Node.js.
 
@@ -20,6 +20,7 @@
 - [Cài Đặt & Chạy](#-cài-đặt--chạy)
 - [Cấu Trúc Thư Mục](#-cấu-trúc-thư-mục)
 - [API Endpoints](#-api-endpoints)
+- [Hướng dẫn xác thực qua API Key](#hướng-dẫn-xác-thực-qua-api-key)
 - [Engine Bát Tự](#-engine-bát-tự)
 - [Bảo Mật](#-bảo-mật)
 
@@ -27,7 +28,7 @@
 
 ## 🌟 Giới Thiệu
 
-**Huyền Cơ Bát Tự** là nền tảng phân tích mệnh lý Tứ Trụ (Bát Tự / BaZi) toàn diện, kết hợp thuật toán tính toán truyền thống với trí tuệ nhân tạo (AI) để cung cấp luận giải chuyên sâu. Hệ thống hỗ trợ đầy đủ lịch Âm - Dương, chuyển đổi Can Chi, và phân tích Ngũ Hành theo mệnh lý học Đông phương.
+**Viet Lac So** là nền tảng phân tích mệnh lý Tứ Trụ (Bát Tự / BaZi) toàn diện, kết hợp thuật toán tính toán truyền thống với trí tuệ nhân tạo (AI) để cung cấp luận giải chuyên sâu. Hệ thống hỗ trợ đầy đủ lịch Âm - Dương, chuyển đổi Can Chi, và phân tích Ngũ Hành theo mệnh lý học Đông phương.
 
 ---
 
@@ -365,13 +366,13 @@ tinix-bazi/
 ### BaZi Analysis
 | Method | Path | Mô tả |
 |---|---|---|
-| `GET` | `/api/analyze` | Phân tích Bát Tự đầy đủ |
-| `GET` | `/api/chart` | Thông tin lá số cơ bản |
-| `GET` | `/api/elements` | Phân tích Ngũ Hành |
-| `GET` | `/api/stars` | Phân tích Thần Sát |
-| `GET` | `/api/luck-cycles` | Phân tích Đại Vận |
-| `GET` | `/api/year-analysis` | Phân tích Lưu Niên |
-| `GET` | `/api/auspicious-dates` | Xem ngày tốt xấu |
+| `GET` | `/api/analyze` | Phân tích Bát Tự đầy đủ (yêu cầu đăng nhập) |
+| `GET` | `/api/chart` | Thông tin lá số cơ bản (yêu cầu đăng nhập) |
+| `GET` | `/api/elements` | Phân tích Ngũ Hành (yêu cầu đăng nhập) |
+| `GET` | `/api/stars` | Phân tích Thần Sát (yêu cầu đăng nhập) |
+| `GET` | `/api/luck-cycles` | Phân tích Đại Vận (yêu cầu đăng nhập) |
+| `GET` | `/api/year-analysis` | Phân tích Lưu Niên (yêu cầu đăng nhập) |
+| `GET` | `/api/auspicious-dates` | Xem ngày tốt xấu (yêu cầu đăng nhập) |
 
 #### Tham số
 | Param | Type | Required | Mô tả |
@@ -387,16 +388,60 @@ tinix-bazi/
 ### AI Consultant
 | Method | Path | Mô tả |
 |---|---|---|
-| `POST` | `/api/consultant/ask` | Hỏi AI tư vấn |
-| `GET` | `/api/consultant/stats` | Thống kê tư vấn |
-| `GET` | `/api/consultant/customers` | Danh sách khách hàng |
-| `GET` | `/api/consultant/history/:id` | Lịch sử tư vấn |
+| `POST` | `/api/consultant/ask` | Hỏi AI tư vấn (đang tắt theo policy mặc định) |
+| `GET` | `/api/consultant/stats` | Thống kê tư vấn (yêu cầu đăng nhập) |
+| `GET` | `/api/consultant/customers` | Danh sách khách hàng (yêu cầu đăng nhập) |
+| `GET` | `/api/consultant/history/:id` | Lịch sử tư vấn (yêu cầu đăng nhập) |
 
 ### Authentication
 | Method | Path | Mô tả |
 |---|---|---|
-| `POST` | `/api/auth/register` | Đăng ký tài khoản |
+| `POST` | `/api/auth/register` | Đăng ký tài khoản (yêu cầu `Authorization: ApiKey <API_KEY_REGISTER>`) |
 | `POST` | `/api/auth/login` | Đăng nhập |
+| `GET` | `/api/users/me` | Lấy thông tin user hiện tại (Bearer hoặc ApiKey user) |
+
+### Hướng dẫn xác thực qua API Key
+
+Mọi route có quyền **`auth`** trong [`backendjs/route-permissions.json`](backendjs/route-permissions.json) đều chấp nhận **một trong hai** cách (xử lý trong `authMiddleware`):
+
+1. **Phiên đăng nhập (web)**: `Authorization: Bearer <session_token>` — token trả về từ `POST /api/auth/login`.
+2. **API Key người dùng (B2B / script)**: `Authorization: ApiKey <user_api_key>` — key dạng plaintext do server tạo **một lần** khi đăng ký thành công, lưu dạng hash (SHA-256) trong DB; mỗi request server so khớp hash.
+
+**Định dạng header (bắt buộc đúng từ khóa `ApiKey` và một khoảng trắng):**
+
+```http
+Authorization: ApiKey your_key_here
+```
+
+**Ba loại “API key” trong hệ thống (không lẫn nhau):**
+
+| Loại | Biến môi trường / nguồn | Mục đích |
+|---|---|---|
+| **Khóa đăng ký** | `API_KEY_REGISTER` trong `backendjs/.env` | Bắt buộc để gọi `POST /api/auth/register`: gửi `Authorization: ApiKey <API_KEY_REGISTER>` **hoặc** trường `inviteCode` trong body trùng giá trị này. Server không chạy đăng ký công khai nếu chưa cấu hình biến này. |
+| **Khóa quản trị** | `API_KEY_MANAGE` trong `backendjs/.env` | Thay cho session admin: `Authorization: ApiKey <API_KEY_MANAGE>` để thỏa rule **`admin`** (ví dụ `POST /api/articles`, `/api/admin/*`). Giá trị so khớp **trực tiếp** với env (không qua bảng user). |
+| **API Key của user** | Trả về trong JSON đăng ký (`apiKey`) — **chỉ hiện lần đầu** | Dùng cho mọi endpoint `auth` như Bearer: phân tích lá số, consultant, v.v. Nếu mất key, cần luồng đăng nhập web hoặc cấp lại key (nếu có tính năng backend tương ứng). |
+
+**Ví dụ: gọi API phân tích với user API key**
+
+```bash
+curl -s -H "Authorization: ApiKey YOUR_USER_API_KEY" \
+  "http://localhost:8888/api/analyze?year=1990&month=5&day=15&hour=10&gender=Nam&calendar=solar"
+```
+
+**Ví dụ: đăng ký tài khoản (cần khóa đăng ký)**
+
+```bash
+curl -s -X POST "http://localhost:8888/api/auth/register" \
+  -H "Authorization: ApiKey YOUR_API_KEY_REGISTER_VALUE" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"u@example.com","username":"user1","password":"secret","name":"User One"}'
+```
+
+**Lưu ý bảo mật**
+
+- Chỉ gửi key qua **HTTPS** trên môi trường thật.
+- Không commit `API_KEY_REGISTER`, `API_KEY_MANAGE` hay user API key vào git; đặt trong `backendjs/.env` hoặc secret manager.
+- User API key có quyền tương đương phiên đăng nhập của user đó (credit, khóa tài khoản… vẫn áp dụng).
 
 ### Articles & Admin
 | Method | Path | Mô tả |
@@ -404,6 +449,30 @@ tinix-bazi/
 | `GET` | `/api/articles` | Danh sách bài viết |
 | `GET/POST/PUT/DELETE` | `/api/admin/*` | Quản trị hệ thống |
 | `GET/POST` | `/api/que/*` | Xin quẻ & luận giải |
+| `POST` | `/api/admin/users/:id/credits/deposit` | Cộng credits cho user |
+| `POST` | `/api/admin/users/:id/credits/withdraw` | Trừ credits cho user |
+
+### Ma trận phân quyền API
+| Mức quyền | Header | Ghi chú |
+|---|---|---|
+| `Public` | Không cần | Truy cập tự do theo rule trong file policy |
+| `Authenticated` | `Authorization: Bearer <session_token>` **hoặc** `Authorization: ApiKey <user_api_key>` | Rule `auth` |
+| `Admin` | Session user có `is_admin = 1` | Rule `admin` |
+| `Manage Key` | `Authorization: ApiKey <API_KEY_MANAGE>` | Có thể đi qua rule `admin` |
+| `Disabled` | Không áp dụng | Trả về `503` từ policy |
+
+#### Policy-driven authorization
+- File cấu hình: `backendjs/route-permissions.json`.
+- Biến môi trường: `ROUTE_PERMISSIONS_FILE=./route-permissions.json` (trong `backendjs/.env`).
+- Cơ chế match: `exact` trước, sau đó `prefix wildcard` (ví dụ `GET /api/admin/*`).
+- Route không có rule sẽ dùng mặc định `auth`.
+- Chỉnh quyền endpoint chỉ cần sửa policy file và restart backend.
+
+#### Trạng thái mặc định hiện tại
+- `POST /api/auth/register`, `POST /api/auth/login`: `public`.
+- `POST /api/consultant/ask`: `disabled`.
+- `/api/admin/*`: `admin` (có thể dùng `API_KEY_MANAGE`).
+- Hầu hết route còn lại: `auth` (theo explicit rule hoặc fallback mặc định).
 
 ---
 
@@ -438,11 +507,12 @@ Engine tính toán Bát Tự được xây dựng hoàn toàn bằng JavaScript,
 
 ## 🔒 Bảo Mật
 
+- **API Key (B2B / tích hợp)**: Xem [Hướng dẫn xác thực qua API Key](#hướng-dẫn-xác-thực-qua-api-key) (header `Authorization`, `API_KEY_REGISTER`, `API_KEY_MANAGE`, key user).
 - **Helmet.js**: HTTP security headers
-- **Rate Limiting**: 3 tầng giới hạn request
-  - General: 500 req / 15 phút
-  - Auth: 50 req / 15 phút
-  - AI: 15 req / 1 phút
+- **Rate Limiting**: 3 tầng giới hạn request (cấu hình qua biến môi trường trong `backendjs/.env`; nếu không set thì dùng mặc định)
+  - General: `RATE_LIMIT_GENERAL_MAX` / `RATE_LIMIT_GENERAL_WINDOW_MS` — mặc định 2500 req / 15 phút (`900000` ms)
+  - Auth: `RATE_LIMIT_AUTH_MAX` / `RATE_LIMIT_AUTH_WINDOW_MS` — mặc định 250 req / 15 phút
+  - AI (consultant): `RATE_LIMIT_AI_MAX` / `RATE_LIMIT_AI_WINDOW_MS` — mặc định 75 req / 1 phút (`60000` ms)
 - **JWT Authentication**: Token-based auth với `jsonwebtoken`
 - **CORS**: Cross-Origin Resource Sharing configuration
 - **Gzip Compression**: Nén response tự động
@@ -478,6 +548,6 @@ MIT License — Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 ---
 
 <p align="center">
-  <b>🏮 Huyền Cơ Bát Tự</b> — Nền tảng mệnh lý học hiện đại<br/>
-  <i>huyencobattu.com</i>
+  <b>🏮 Viet Lac So</b> — Nền tảng mệnh lý học hiện đại<br/>
+  <i>vietlac.com</i>
 </p>

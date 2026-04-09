@@ -25,6 +25,10 @@ const authenticateToken = async (req, res, next) => {
         if (!user) {
             return res.status(403).json({ success: false, message: 'User not found' });
         }
+        if (user.status && user.status !== 'active') {
+            await db.deleteSession(token);
+            return res.status(403).json({ success: false, message: 'Account is inactive' });
+        }
 
         req.user = user;
         req.token = token; // Pass token just in case
@@ -36,10 +40,8 @@ const authenticateToken = async (req, res, next) => {
 };
 
 const requireAdmin = (req, res, next) => {
-    const userRole = req.user?.role?.toLowerCase?.() || '';
-    console.log('[Auth] requireAdmin check - user role:', req.user?.role, '| normalized:', userRole);
-    if (!req.user || userRole !== 'admin') {
-        return res.status(403).json({ success: false, message: 'Admin access required', userRole: req.user?.role });
+    if (!req.user || !req.user.is_admin) {
+        return res.status(403).json({ success: false, message: 'Admin access required' });
     }
     next();
 };

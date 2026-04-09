@@ -18,7 +18,14 @@ const RecentCustomers = () => {
 
     const fetchRecentCustomers = async () => {
         try {
-            const response = await fetch(`${API_BASE}/recent?limit=10`);
+            const authToken = localStorage.getItem('auth_token');
+            if (!authToken) {
+                setCustomers([]);
+                return;
+            }
+            const response = await fetch(`${API_BASE}/recent?limit=10`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
             if (response.ok) {
                 const data = await response.json();
                 setCustomers(data);

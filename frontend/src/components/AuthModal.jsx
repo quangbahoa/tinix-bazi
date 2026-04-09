@@ -1,46 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { API_CONFIG } from '../config/api';
-
-const API_BASE = API_CONFIG.AUTH;
 
 const AuthModal = ({ onClose, onSuccess }) => {
     const [mode, setMode] = useState('login'); // login or register
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
+    const [inviteCode, setInviteCode] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // CAPTCHA state
-    const [captchaToken, setCaptchaToken] = useState('');
-    const [captchaQuestion, setCaptchaQuestion] = useState('');
-    const [captchaAnswer, setCaptchaAnswer] = useState('');
-    const [loadingCaptcha, setLoadingCaptcha] = useState(false);
-
     const { login, register } = useAuth();
-
-    // Fetch CAPTCHA when switching to register mode
-    useEffect(() => {
-        if (mode === 'register') {
-            fetchCaptcha();
-        }
-    }, [mode]);
-
-    const fetchCaptcha = async () => {
-        setLoadingCaptcha(true);
-        try {
-            const res = await fetch(`${API_BASE}/captcha`);
-            const data = await res.json();
-            setCaptchaToken(data.token);
-            setCaptchaQuestion(data.question);
-            setCaptchaAnswer('');
-        } catch (err) {
-            console.error('Failed to fetch CAPTCHA:', err);
-        } finally {
-            setLoadingCaptcha(false);
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -51,21 +22,12 @@ const AuthModal = ({ onClose, onSuccess }) => {
             if (mode === 'login') {
                 await login(email, password);
             } else {
-                if (!captchaAnswer) {
-                    setError('Vui lòng nhập đáp án xác thực');
-                    setLoading(false);
-                    return;
-                }
-                await register(email, password, name, captchaToken, captchaAnswer);
+                await register(email, password, name, username, inviteCode);
             }
             onSuccess?.();
             onClose();
         } catch (err) {
             setError(err.message);
-            // Refresh CAPTCHA on error
-            if (mode === 'register') {
-                fetchCaptcha();
-            }
         } finally {
             setLoading(false);
         }
@@ -74,7 +36,6 @@ const AuthModal = ({ onClose, onSuccess }) => {
     const handleModeSwitch = (newMode) => {
         setMode(newMode);
         setError('');
-        setCaptchaAnswer('');
     };
 
     return (
@@ -107,6 +68,34 @@ const AuthModal = ({ onClose, onSuccess }) => {
                         </div>
                     )}
 
+                    {mode === 'register' && (
+                        <div className="form-group">
+                            <label>Username</label>
+                            <input
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Chỉ chữ và số (A-Z, a-z, 0-9)"
+                                className="glass-input"
+                                required
+                            />
+                        </div>
+                    )}
+
+                    {mode === 'register' && (
+                        <div className="form-group">
+                            <label>Invite Code (debug)</label>
+                            <input
+                                type="text"
+                                value={inviteCode}
+                                onChange={(e) => setInviteCode(e.target.value)}
+                                placeholder="Nhập API key provisioning"
+                                className="glass-input"
+                                required
+                            />
+                        </div>
+                    )}
+
                     <div className="form-group">
                         <label>Email</label>
                         <input
@@ -130,35 +119,6 @@ const AuthModal = ({ onClose, onSuccess }) => {
                             required
                         />
                     </div>
-
-                    {/* CAPTCHA for Register */}
-                    {mode === 'register' && (
-                        <div className="form-group captcha-group">
-                            <label>Xác thực (CAPTCHA)</label>
-                            <div className="captcha-box">
-                                <div className="captcha-question">
-                                    {loadingCaptcha ? '...' : captchaQuestion}
-                                </div>
-                                <button
-                                    type="button"
-                                    className="captcha-refresh"
-                                    onClick={fetchCaptcha}
-                                    disabled={loadingCaptcha}
-                                    title="Lấy câu hỏi mới"
-                                >
-                                    🔄
-                                </button>
-                            </div>
-                            <input
-                                type="number"
-                                value={captchaAnswer}
-                                onChange={(e) => setCaptchaAnswer(e.target.value)}
-                                placeholder="Nhập đáp án"
-                                className="glass-input captcha-input"
-                                required
-                            />
-                        </div>
-                    )}
 
                     <button
                         type="submit"
