@@ -18,6 +18,7 @@
 - [System Architecture](#-system-architecture)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
+- [Docker & Easypanel](#docker--easypanel)
 - [Project Structure](#-project-structure)
 - [API Endpoints](#-api-endpoints)
 - [BaZi Engine](#-bazi-engine)
@@ -247,7 +248,26 @@ npm run dev:backend    # API server at http://localhost:8888
 
 ```bash
 npm run build   # Build frontend → frontend/dist/
-npm start       # Run backend in production
+# Serve SPA + API from one Node: copy the Vite build into backendjs/public
+rm -rf backendjs/public && mkdir -p backendjs/public && cp -r frontend/dist/* backendjs/public/
+npm start       # http://localhost:8888 — UI at /, API at /api/*
+```
+
+If **`backendjs/public`** is missing, `npm start` runs **API only** (JSON at `GET /`, health at `GET /api/health`).
+
+### 5. Docker & Easypanel
+
+- **Dockerfile** (repo root): multi-stage `npm ci`, copies `frontend/dist` to `backendjs/public`, single `node server.js` on port **8888** (or `PORT`).
+- **SQLite**: mount a volume at **`/app/backendjs/data`** inside the container to persist `bazi_consultant.db` across redeploys.
+- **Reverse proxy**: set `TRUST_PROXY=1` in `backendjs/.env` or the panel environment when behind a proxy (see `backendjs/.env.example`).
+- Easypanel: use an [App Service](https://easypanel.io/docs/services/app) with Git + Dockerfile; set **Proxy port** to 8888 (or your `PORT`); paste env vars equivalent to `.env` (panel Environment is enough—no `.env` file required in the image).
+
+```bash
+docker build -t tinix-bazi .
+docker run --rm -p 8888:8888 \
+  -e TRUST_PROXY=1 \
+  -v tinix-bazi-data:/app/backendjs/data \
+  tinix-bazi
 ```
 
 ---

@@ -18,6 +18,7 @@
 - [Kiến Trúc Hệ Thống](#-kiến-trúc-hệ-thống)
 - [Công Nghệ Sử Dụng](#-công-nghệ-sử-dụng)
 - [Cài Đặt & Chạy](#-cài-đặt--chạy)
+- [Docker & Easypanel](#docker--easypanel)
 - [Cấu Trúc Thư Mục](#-cấu-trúc-thư-mục)
 - [API Endpoints](#-api-endpoints)
 - [Engine Bát Tự](#-engine-bát-tự)
@@ -247,7 +248,26 @@ npm run dev:backend    # API server tại http://localhost:8888
 
 ```bash
 npm run build   # Build frontend → frontend/dist/
-npm start       # Chạy backend production
+# Để phục vụ SPA + API cùng một Node: copy bản build vào backendjs/public
+rm -rf backendjs/public && mkdir -p backendjs/public && cp -r frontend/dist/* backendjs/public/
+npm start       # http://localhost:8888 — giao diện tại /, API tại /api/*
+```
+
+Nếu **không** có thư mục `backendjs/public`, `npm start` chỉ chạy API (JSON tại `GET /`, health tại `GET /api/health`).
+
+### 5. Docker & Easypanel
+
+- **Dockerfile** (root): build multi-stage với `npm ci`, copy `frontend/dist` → `backendjs/public`, một process `node server.js` lắng nghe cổng **8888** (hoặc `PORT`).
+- **SQLite**: mount volume vào **`/app/backendjs/data`** trong container để giữ `bazi_consultant.db` khi redeploy.
+- **Reverse proxy**: trong `backendjs/.env` hoặc biến môi trường panel đặt `TRUST_PROXY=1` khi chạy sau proxy (xem `backendjs/.env.example`).
+- Triển khai trên Easypanel: tạo [App Service](https://easypanel.io/docs/services/app), nguồn Git + Dockerfile; **Proxy port** = 8888 (hoặc đúng `PORT`); biến môi trường dán tương đương `.env` (không cần mount file `.env` nếu khai báo trên panel).
+
+```bash
+docker build -t tinix-bazi .
+docker run --rm -p 8888:8888 \
+  -e TRUST_PROXY=1 \
+  -v tinix-bazi-data:/app/backendjs/data \
+  tinix-bazi
 ```
 
 ---
