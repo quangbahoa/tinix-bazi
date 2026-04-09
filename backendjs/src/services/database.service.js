@@ -142,13 +142,6 @@ class DatabaseService {
             await this.run(`ALTER TABLE customers ADD COLUMN time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh'`);
         }
 
-        // customers.time_zone migration for old databases
-        const customerColumns = await this.all(`PRAGMA table_info(customers)`);
-        const hasTimeZoneColumn = customerColumns.some((col) => col.name === 'time_zone');
-        if (!hasTimeZoneColumn) {
-            await this.run(`ALTER TABLE customers ADD COLUMN time_zone TEXT DEFAULT 'Asia/Ho_Chi_Minh'`);
-        }
-
         // Consultations table - Expanded with detailed context
         await this.run(`
             CREATE TABLE IF NOT EXISTS consultations (

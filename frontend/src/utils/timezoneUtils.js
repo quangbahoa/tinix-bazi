@@ -93,31 +93,6 @@ export function buildTimeZoneOptions() {
 }
 
 function getContinentFromTimeZone(timeZone) {
-const CONTINENT_LABELS = {
-    Asia: 'Châu Á',
-    Europe: 'Châu Âu',
-    America: 'Châu Mỹ',
-    Africa: 'Châu Phi',
-    Australia: 'Châu Đại Dương',
-    Pacific: 'Thái Bình Dương',
-    Atlantic: 'Đại Tây Dương',
-    Indian: 'Ấn Độ Dương',
-    Antarctica: 'Nam Cực'
-};
-
-const CONTINENT_ORDER = [
-    'Asia',
-    'Europe',
-    'America',
-    'Africa',
-    'Australia',
-    'Pacific',
-    'Atlantic',
-    'Indian',
-    'Antarctica'
-];
-
-export function getContinentFromTimeZone(timeZone) {
     const [raw] = String(timeZone || '').split('/');
     return CONTINENT_LABELS[raw] ? raw : 'Other';
 }
