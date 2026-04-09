@@ -260,6 +260,7 @@ Nếu **không** có thư mục `backendjs/public`, `npm start` chỉ chạy API
 
 - **Dockerfile** (root): build multi-stage với `npm ci`, copy `frontend/dist` → `backendjs/public`, một process `node server.js` lắng nghe cổng **8888** (hoặc `PORT`).
 - **SQLite**: mount volume vào **`/app/backendjs/data`** trong container để giữ `bazi_consultant.db` khi redeploy.
+- **Admin seed mặc định**: đặt `AUTO_SEED_ADMINS=false` trên production để tránh tự tạo tài khoản admin mặc định khi restart/redeploy. Chỉ bật `AUTO_SEED_ADMINS=true` khi bạn chủ động bootstrap admin.
 - **Reverse proxy**: trong `backendjs/.env` hoặc biến môi trường panel đặt `TRUST_PROXY=1` khi chạy sau proxy (xem `backendjs/.env.example`).
 - Triển khai trên Easypanel: tạo [App Service](https://easypanel.io/docs/services/app), nguồn Git + Dockerfile; **Proxy port** = 8888 (hoặc đúng `PORT`); biến môi trường dán tương đương `.env` (không cần mount file `.env` nếu khai báo trên panel).
 

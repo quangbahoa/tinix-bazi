@@ -401,7 +401,21 @@ class DatabaseService {
         await this.run(`CREATE INDEX IF NOT EXISTS idx_access_logs_ip ON access_logs(ip)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_access_logs_path ON access_logs(path)`);
 
-        // Create Default Admins
+        await this.seedDefaultAdminsIfEnabled();
+
+        console.log('[DB] Tables and indexes checked/created.');
+        await this.initDefaultCategories();
+        await this.initDefaultArticleCategories();
+        await this.autoSeedArticles();
+    }
+
+    async seedDefaultAdminsIfEnabled() {
+        if (process.env.AUTO_SEED_ADMINS !== 'true') {
+            console.log('[DB] Default admin seeding skipped (set AUTO_SEED_ADMINS=true to enable).');
+            return;
+        }
+
+        console.log('[DB] Default admin seeding enabled. Checking default admin accounts...');
         const admins = [
             { email: 'admin@huyencobattu.vn', hash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'Administrator' },
             { email: 'admin@admin.com', hash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'System Admin' }
@@ -411,20 +425,18 @@ class DatabaseService {
             const email = admin.email.toLowerCase().trim();
             const exists = await this.get(`SELECT id FROM users WHERE LOWER(TRIM(email)) = ?`, [email]);
 
-            if (!exists) {
-                console.log(`[DB] Admin ${email} not found. Creating...`);
-                await this.run(`
-                    INSERT INTO users (email, password_hash, name, credits, is_admin)
-                    VALUES (?, ?, ?, 9999, 1)
-                `, [email, admin.hash, admin.name]);
-                console.log(`[DB] Admin ${email} created.`);
+            if (exists) {
+                console.log(`[DB] Default admin ${email} already exists. Skipping create.`);
+                continue;
             }
-        }
 
-        console.log('[DB] Tables and indexes checked/created.');
-        await this.initDefaultCategories();
-        await this.initDefaultArticleCategories();
-        await this.autoSeedArticles();
+            console.log(`[DB] Default admin ${email} not found. Creating...`);
+            await this.run(`
+                INSERT INTO users (email, password_hash, name, credits, is_admin)
+                VALUES (?, ?, ?, 9999, 1)
+            `, [email, admin.hash, admin.name]);
+            console.log(`[DB] Default admin ${email} created.`);
+        }
     }
 
     /**
