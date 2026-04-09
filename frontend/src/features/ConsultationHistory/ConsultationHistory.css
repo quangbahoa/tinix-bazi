@@ -276,7 +276,7 @@
 
 .connector-badge {
     font-size: 1rem;
-    font-weight: 800;
+    font-weight: 500;
     color: #000;
     background: var(--gold);
     padding: 0.5rem 0.8rem;
@@ -414,7 +414,7 @@
 
 .que-name {
     font-size: 2rem;
-    font-weight: 800;
+    font-weight: 500;
     color: var(--gold);
     text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
     margin-bottom: 0.5rem;
@@ -426,7 +426,7 @@
     background: var(--gold);
     color: #000;
     border-radius: 50px;
-    font-weight: 800;
+    font-weight: 500;
     font-size: 0.9rem;
     text-transform: uppercase;
     box-shadow: 0 4px 12px rgba(226, 192, 68, 0.3);

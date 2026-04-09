@@ -141,7 +141,7 @@ const AppContent = () => {
     <HelmetProvider>
       <Shell hasData={hasData} onClearData={clearData}>
         <SEO
-          title={hasData ? "Luận Giải Chi Tiết" : "Huyền Cơ Bát Tự - Trang Chủ"}
+          title={hasData ? "Luận Giải Chi Tiết" : "Viet Lac So - Trang Chủ"}
           url={location.pathname}
         />
         <div className="bazi-bg"></div>

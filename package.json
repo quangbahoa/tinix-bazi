@@ -2,7 +2,7 @@
     "name": "huyencobattu",
     "version": "2.0.0",
     "private": true,
-    "description": "Huyền Cơ Bát Tự - BaZi Analysis Platform",
+    "description": "Viet Lac So - BaZi Analysis Platform",
     "workspaces": [
         "frontend",
         "backendjs"

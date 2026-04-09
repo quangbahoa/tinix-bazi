@@ -21,7 +21,15 @@ const ArticlePage = () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/${slug}`);
+            const authToken = localStorage.getItem('auth_token');
+            if (!authToken) {
+                setError('Vui lòng đăng nhập để xem bài viết');
+                setLoading(false);
+                return;
+            }
+            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/${slug}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
             const data = await res.json();
             if (data.success) {
                 setArticle(data.article);
@@ -60,23 +68,23 @@ const ArticlePage = () => {
             "description": article.excerpt || article.title,
             "author": {
                 "@type": "Person",
-                "name": article.author || "Huyền Cơ Bát Tự"
+                "name": article.author || "Viet Lac So"
             },
             "publisher": {
                 "@type": "Organization",
-                "name": "Huyền Cơ Bát Tự",
+                "name": "Viet Lac So",
                 "logo": {
                     "@type": "ImageObject",
-                    "url": "https://huyencobattu.com/logo.png"
+                    "url": "https://vietlac.com/logo.png"
                 }
             },
             "datePublished": formatDateISO(article.created_at),
             "dateModified": formatDateISO(article.updated_at || article.created_at),
             "mainEntityOfPage": {
                 "@type": "WebPage",
-                "@id": `https://huyencobattu.com/bai-viet/${article.slug}`
+                "@id": `https://vietlac.com/bai-viet/${article.slug}`
             },
-            "image": article.thumbnail || "https://huyencobattu.com/og-image-default.jpg"
+            "image": article.thumbnail || "https://vietlac.com/og-image-default.jpg"
         };
     };
 
@@ -112,7 +120,7 @@ const ArticlePage = () => {
                 keywords={`bát tự, ${article.category_name || 'tử vi'}, ${article.title.toLowerCase()}`}
                 type="article"
                 url={`/bai-viet/${article.slug}`}
-                canonical={`https://huyencobattu.com/bai-viet/${article.slug}`}
+                canonical={`https://vietlac.com/bai-viet/${article.slug}`}
                 image={article.thumbnail}
                 structuredData={getStructuredData()}
             />

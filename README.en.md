@@ -1,4 +1,4 @@
-# 🏮 Huyền Cơ Bát Tự — BaZi Analysis Platform
+# 🏮 Viet Lac So — BaZi Analysis Platform
 
 > A comprehensive Four Pillars of Destiny (BaZi / 八字) analysis platform with AI-powered consultation, built with React 19 & Node.js.
 
@@ -21,6 +21,7 @@
 - [Docker & Easypanel](#docker--easypanel)
 - [Project Structure](#-project-structure)
 - [API Endpoints](#-api-endpoints)
+- [API Key authentication](#api-key-authentication)
 - [BaZi Engine](#-bazi-engine)
 - [Security](#-security)
 
@@ -28,7 +29,7 @@
 
 ## 🌟 Introduction
 
-**Huyền Cơ Bát Tự** is a full-featured Chinese metaphysics platform for Four Pillars of Destiny (BaZi / 八字) analysis. It combines traditional calculation algorithms with artificial intelligence (AI) to deliver in-depth life readings. The system supports both Solar and Lunar calendars, Heavenly Stems & Earthly Branches conversion, and Five Elements analysis following Eastern astrology principles.
+**Viet Lac So** is a full-featured Chinese metaphysics platform for Four Pillars of Destiny (BaZi / 八字) analysis. It combines traditional calculation algorithms with artificial intelligence (AI) to deliver in-depth life readings. The system supports both Solar and Lunar calendars, Heavenly Stems & Earthly Branches conversion, and Five Elements analysis following Eastern astrology principles.
 
 ---
 
@@ -407,7 +408,7 @@ tinix-bazi/
 ### AI Consultant
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/api/consultant/ask` | Ask AI consultant |
+| `POST` | `/api/consultant/ask` | Ask AI consultant (disabled by default policy) |
 | `GET` | `/api/consultant/stats` | Consultation statistics |
 | `GET` | `/api/consultant/customers` | Customer list |
 | `GET` | `/api/consultant/history/:id` | Customer consultation history |
@@ -415,8 +416,52 @@ tinix-bazi/
 ### Authentication
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/api/auth/register` | Register account |
+| `POST` | `/api/auth/register` | Register account (requires `Authorization: ApiKey <API_KEY_REGISTER>`) |
 | `POST` | `/api/auth/login` | Login |
+| `GET` | `/api/users/me` | Get current user profile (Bearer or user ApiKey) |
+
+### API Key authentication
+
+Every route with the **`auth`** permission in [`backendjs/route-permissions.json`](backendjs/route-permissions.json) accepts **either** of the following (handled by `authMiddleware`):
+
+1. **Browser session**: `Authorization: Bearer <session_token>` — token from `POST /api/auth/login`.
+2. **User API key (B2B / automation)**: `Authorization: ApiKey <user_api_key>` — a plaintext key issued **once** on successful registration; the server stores only a SHA-256 hash and validates each request.
+
+**Header format (the scheme name `ApiKey` and a single space are required):**
+
+```http
+Authorization: ApiKey your_key_here
+```
+
+**Three different “API keys” in this project (do not confuse them):**
+
+| Kind | Source | Purpose |
+|---|---|---|
+| **Registration key** | `API_KEY_REGISTER` in `backendjs/.env` | Required for `POST /api/auth/register`: send `Authorization: ApiKey <API_KEY_REGISTER>` **or** put the same value in body field `inviteCode`. Registration is disabled until this env var is set. |
+| **Manage key** | `API_KEY_MANAGE` in `backendjs/.env` | Stand-in for an admin session: `Authorization: ApiKey <API_KEY_MANAGE>` satisfies the **`admin`** policy (e.g. `POST /api/articles`, `/api/admin/*`). Compared directly to the env value (not the user key table). |
+| **Per-user API key** | Returned in the register response (`apiKey`) — **shown only once** | Use on any `auth` endpoint like a Bearer token (chart analysis, consultant, etc.). If lost, use web login or any backend flow that re-issues keys. |
+
+**Example: BaZi analysis with a user API key**
+
+```bash
+curl -s -H "Authorization: ApiKey YOUR_USER_API_KEY" \
+  "http://localhost:8888/api/analyze?year=1990&month=5&day=15&hour=10&gender=Nam&calendar=solar"
+```
+
+**Example: register (registration key required)**
+
+```bash
+curl -s -X POST "http://localhost:8888/api/auth/register" \
+  -H "Authorization: ApiKey YOUR_API_KEY_REGISTER_VALUE" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"u@example.com","username":"user1","password":"secret","name":"User One"}'
+```
+
+**Security notes**
+
+- Use **HTTPS** in production.
+- Never commit `API_KEY_REGISTER`, `API_KEY_MANAGE`, or user API keys; keep them in `backendjs/.env` or a secret store.
+- A user API key grants the same access as that user’s logged-in session (credits, account status, etc.).
 
 ### Articles & Admin
 | Method | Path | Description |
@@ -424,6 +469,30 @@ tinix-bazi/
 | `GET` | `/api/articles` | List articles |
 | `GET/POST/PUT/DELETE` | `/api/admin/*` | System administration |
 | `GET/POST` | `/api/que/*` | Hexagram divination & reading |
+| `POST` | `/api/admin/users/:id/credits/deposit` | Add credits for a user |
+| `POST` | `/api/admin/users/:id/credits/withdraw` | Subtract credits from a user |
+
+### API Permission Matrix
+| Access level | Header | Notes |
+|---|---|---|
+| `Public` | None | Open access based on policy rule |
+| `Authenticated` | `Authorization: Bearer <session_token>` **or** `Authorization: ApiKey <user_api_key>` | `auth` policy |
+| `Admin` | Session user with `is_admin = 1` | `admin` policy |
+| `Manage Key` | `Authorization: ApiKey <API_KEY_MANAGE>` | Can satisfy `admin` policy |
+| `Disabled` | N/A | Returns `503` from policy |
+
+#### Policy-driven authorization
+- Config file: `backendjs/route-permissions.json`.
+- Environment variable: `ROUTE_PERMISSIONS_FILE=./route-permissions.json` (in `backendjs/.env`).
+- Match order: `exact` first, then `prefix wildcard` (for example `GET /api/admin/*`).
+- Routes without explicit rules use default `auth`.
+- To change endpoint permissions, update the policy file and restart backend.
+
+#### Current default policy state
+- `POST /api/auth/register`, `POST /api/auth/login`: `public`.
+- `POST /api/consultant/ask`: `disabled`.
+- `/api/admin/*`: `admin` (or `API_KEY_MANAGE`).
+- Most other routes: `auth` (explicitly configured or fallback default).
 
 ---
 
@@ -458,11 +527,12 @@ The BaZi calculation engine is built entirely in JavaScript:
 
 ## 🔒 Security
 
+- **API Key (B2B / integration)**: See [API Key authentication](#api-key-authentication) (`Authorization` header, `API_KEY_REGISTER`, `API_KEY_MANAGE`, per-user keys).
 - **Helmet.js**: HTTP security headers
-- **Rate Limiting**: 3-tier request limiting
-  - General: 500 req / 15 min
-  - Auth: 50 req / 15 min
-  - AI: 15 req / 1 min
+- **Rate Limiting**: 3-tier request limiting (configure via env in `backendjs/.env`; defaults apply when unset)
+  - General: `RATE_LIMIT_GENERAL_MAX` / `RATE_LIMIT_GENERAL_WINDOW_MS` — default 2500 req / 15 min (`900000` ms)
+  - Auth: `RATE_LIMIT_AUTH_MAX` / `RATE_LIMIT_AUTH_WINDOW_MS` — default 250 req / 15 min
+  - AI (consultant): `RATE_LIMIT_AI_MAX` / `RATE_LIMIT_AI_WINDOW_MS` — default 75 req / 1 min (`60000` ms)
 - **JWT Authentication**: Token-based auth with `jsonwebtoken`
 - **CORS**: Cross-Origin Resource Sharing configuration
 - **Gzip Compression**: Automatic response compression
@@ -498,6 +568,6 @@ MIT License — See [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <b>🏮 Huyền Cơ Bát Tự</b> — Modern Chinese Metaphysics Platform<br/>
-  <i>huyencobattu.com</i>
+  <b>🏮 Viet Lac So</b> — Modern Chinese Metaphysics Platform<br/>
+  <i>vietlac.com</i>
 </p>

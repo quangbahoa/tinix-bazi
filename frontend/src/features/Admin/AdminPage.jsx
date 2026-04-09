@@ -843,7 +843,11 @@ const ArticlesAdminPage = () => {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/categories`);
+            const authToken = token || localStorage.getItem('auth_token');
+            if (!authToken) return;
+            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/categories`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
             const data = await res.json();
             if (data.success) setCategories(data.categories || []);
         } catch (err) { console.error(err); }
@@ -1087,7 +1091,7 @@ const AdminPage = () => {
             <aside className="admin-sidebar">
                 <div className="sidebar-header">
                     <h1>⚙️ ADMIN</h1>
-                    <span className="subtitle">Huyền Cơ Bát Tự</span>
+                    <span className="subtitle">Viet Lac So</span>
                 </div>
                 <nav className="sidebar-nav">
                     <Link to="/admin" className={path === '/admin' ? 'active' : ''}>

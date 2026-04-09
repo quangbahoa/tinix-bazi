@@ -80,7 +80,7 @@ const QueShareCard = forwardRef(({ data, topic }, ref) => {
                     fontSize: '1rem',
                     letterSpacing: '1px'
                 }}>
-                    🔮 HUYỀN CƠ BÁT TỰ
+                    🔮 VIET LAC SO
                 </h3>
                 <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.75rem' }}>
                     {today}
@@ -201,7 +201,7 @@ const QueShareCard = forwardRef(({ data, topic }, ref) => {
                     margin: 0,
                     fontSize: '0.7rem'
                 }}>
-                    huyencobattu.com • Huyền Cơ Luận Giải
+                    vietlac.com • Viet Lac So Luận Giải
                 </p>
             </div>
         </div>

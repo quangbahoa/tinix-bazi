@@ -187,7 +187,7 @@ khaiNiem.forEach((a) => {
         content: generateRichContent(a.title, a.excerpt, 'khai-niem'),
         thumbnail: '/images/articles/bazi_concept.png',
         category_slug: 'khai-niem',
-        author: 'Huyền Cơ Bát Tự',
+        author: 'Viet Lac So',
         is_featured: articles.length === 0,
         is_published: true
     });
@@ -225,7 +225,7 @@ cachLuan.forEach((a) => {
         content: generateRichContent(a.title, a.excerpt, 'cach-luan'),
         thumbnail: '/images/articles/bazi_interpretation.png',
         category_slug: 'cach-luan',
-        author: 'Huyền Cơ Bát Tự',
+        author: 'Viet Lac So',
         is_featured: false,
         is_published: true
     });
@@ -263,7 +263,7 @@ nguHanh.forEach((a) => {
         content: generateRichContent(a.title, a.excerpt, 'ngu-hanh'),
         thumbnail: '/images/articles/bazi_elements.png',
         category_slug: 'ngu-hanh',
-        author: 'Huyền Cơ Bát Tự',
+        author: 'Viet Lac So',
         is_featured: false,
         is_published: true
     });
@@ -301,7 +301,7 @@ canChi.forEach((a) => {
         content: generateRichContent(a.title, a.excerpt, 'can-chi'),
         thumbnail: '/images/articles/bazi_canchi.png',
         category_slug: 'can-chi',
-        author: 'Huyền Cơ Bát Tự',
+        author: 'Viet Lac So',
         is_featured: false,
         is_published: true
     });
@@ -339,7 +339,7 @@ ungDung.forEach((a) => {
         content: generateRichContent(a.title, a.excerpt, 'ung-dung'),
         thumbnail: '/images/articles/bazi_practical.png',
         category_slug: 'ung-dung',
-        author: 'Huyền Cơ Bát Tự',
+        author: 'Viet Lac So',
         is_featured: false,
         is_published: true
     });

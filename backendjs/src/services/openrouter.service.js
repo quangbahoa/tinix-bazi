@@ -44,7 +44,7 @@ class OpenRouterService {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${this.apiKey}`,
-                        'HTTP-Referer': 'https://huyencobattu.com',
+                        'HTTP-Referer': 'https://vietlac.com',
                         'X-Title': 'BaZi Consultant'
                     },
                     body: JSON.stringify({
@@ -153,7 +153,7 @@ class OpenRouterService {
      */
     buildSystemPrompt(personaId) {
         const personas = {
-            'huyen_co': `Bạn là Thầy Huyền Cơ Bát Tự - một bậc thầy uyên bác về Tử Vi và Bát Tự (Tứ Trụ) với hơn 35 năm tu luyện và hành nghề.
+            'huyen_co': `Bạn là Thầy Viet Lac So - một bậc thầy uyên bác về Tử Vi và Bát Tự (Tứ Trụ) với hơn 35 năm tu luyện và hành nghề.
 THẺ TÍNH CÁCH:
 - Uyên bác, thâm sâu nhưng gần gũi, dễ hiểu
 - Nhân văn, từ tốn, luôn hướng thiện cho người xem
@@ -311,7 +311,7 @@ ${luckInfo}
  Hãy phân tích và trả lời câu hỏi trên dựa trên lá số Bát Tự được cung cấp.
  
  YÊU CẦU QUAN TRỌNG:
- 1. Trả lời bằng phong cách của nhân vật ${personaId === 'menh_meo' ? 'Thầy Mệnh Mèo GenZ' : 'Thầy Huyền Cơ Bát Tự'}.
+ 1. Trả lời bằng phong cách của nhân vật ${personaId === 'menh_meo' ? 'Thầy Mệnh Mèo GenZ' : 'Thầy Viet Lac So'}.
  2. Đưa ra 3-5 đoạn văn ngắn gọn, súc tích.
  3. CUỐI CÙNG LÀ PHẦN [FOLLOW_UP] VỚI 3-5 CÂU HỎI GỢI MỞ.
     Ví dụ về câu hỏi gợi mở dựa trên lá số:
@@ -383,7 +383,7 @@ ${luckInfo}
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${this.apiKey}`,
-                        'HTTP-Referer': 'https://huyencobattu.com',
+                        'HTTP-Referer': 'https://vietlac.com',
                         'X-Title': 'BaZi Comprehensive'
                     },
                     body: JSON.stringify({
@@ -565,7 +565,7 @@ ${luckInfo}
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${this.apiKey}`,
-                        'HTTP-Referer': 'https://huyencobattu.com',
+                        'HTTP-Referer': 'https://vietlac.com',
                         'X-Title': 'BaZi Matching'
                     },
                     body: JSON.stringify({
