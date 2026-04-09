@@ -1,7 +1,7 @@
 {
     "name": "huyencobattu-backend",
     "version": "1.0.0",
-    "description": "BaZi Mega-Evolution API - Node.js Backend",
+    "description": "VietLac BaZi API - Node.js Backend",
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
