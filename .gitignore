@@ -30,4 +30,6 @@ npm-debug.log*
 *.sln
 *.sw?
 *.local
-.cursor
+.cursor/*
+/.cursor
+.cursor/
