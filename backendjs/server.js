@@ -1,5 +1,7 @@
 require('dotenv').config();
 process.env.TZ = 'Asia/Ho_Chi_Minh';
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -17,6 +19,15 @@ const queRoutes = require('./src/routes/que.routes');
 const { routePermissionsMiddleware } = require('./src/middleware/routePermissions');
 // const dailyRoutes = require('./src/routes/daily.routes');
 const dbService = require('./src/services/database.service');
+
+const staticDir = path.join(__dirname, 'public');
+const serveSpa = fs.existsSync(staticDir);
+
+const parseTrustProxy = () => {
+    const v = String(process.env.TRUST_PROXY || '').trim().toLowerCase();
+    if (['1', 'true', 'yes'].includes(v)) return 1;
+    return false;
+};
 
 const app = express();
 const PORT = process.env.PORT || 8888;
@@ -44,9 +55,17 @@ app.use(cors());
 app.use(express.json({ limit: '5mb' })); // Increased limit for large chart data
 app.use(generalLimiter); // Apply general rate limit to all routes
 
+app.set('trust proxy', parseTrustProxy());
 // Trust proxy for real IP behind Nginx/Cloudflare
 app.set('trust proxy', false);
 
+const skipAccessDbLog = (rawUrl) => {
+    const pathOnly = (rawUrl || '').split('?')[0];
+    if (pathOnly === '/api/docs' || pathOnly === '/api/health' || pathOnly.startsWith('/assets')) return true;
+    if (serveSpa && pathOnly === '/') return true;
+    if (!pathOnly.startsWith('/api') && /^\/[^/]+\.[a-z0-9]+$/i.test(pathOnly)) return true;
+    return false;
+};
 
 // Access logging middleware
 app.use((req, res, next) => {
@@ -64,8 +83,7 @@ app.use((req, res, next) => {
 
     // Hook into response finish to capture status code + response time
     res.on('finish', () => {
-        // Skip static assets and health checks to reduce noise
-        if (req.url === '/' || req.url === '/api/docs' || req.url.startsWith('/assets')) return;
+        if (skipAccessDbLog(req.url)) return;
 
         const responseTime = Date.now() - startTime;
         dbService.saveAccessLog({
@@ -95,15 +113,15 @@ app.use('/api/articles', articlesRoutes);  // Articles routes
 app.use('/api/que', queRoutes);
 // app.use('/api/daily', dailyRoutes);
 
+const apiMetaJson = () => ({
+    name: 'BaZi Mega-Evolution API',
+    version: '2.1',
+    status: 'running',
+    docs: '/api/docs'
+});
 
-// Health check
-app.get('/', (req, res) => {
-    res.json({
-        name: 'BaZi Mega-Evolution API',
-        version: '2.1',
-        status: 'running',
-        docs: '/api/docs'
-    });
+app.get('/api/health', (req, res) => {
+    res.json(apiMetaJson());
 });
 
 // API Documentation
@@ -133,6 +151,19 @@ app.get('/api/docs', (req, res) => {
         }
     });
 });
+
+if (serveSpa) {
+    app.use(express.static(staticDir, { index: 'index.html', maxAge: '1h' }));
+    app.get('*', (req, res, next) => {
+        if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+        if (req.path.startsWith('/api')) return next();
+        res.sendFile(path.join(staticDir, 'index.html'), (err) => (err ? next(err) : undefined));
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.json(apiMetaJson());
+    });
+}
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -170,6 +201,7 @@ process.once('SIGUSR2', () => {
 
         app.listen(PORT, () => {
             console.log(`🚀 BaZi Mega-Evolution API running on port ${PORT}`);
+            if (serveSpa) console.log(`🌐 SPA static: ${staticDir}`);
             console.log(`📚 API Docs (local): http://localhost:${PORT}/api/docs`);
             console.log(`💾 SQLite Database: data/bazi_consultant.db`);
 
