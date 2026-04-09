@@ -6,6 +6,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 // Database file path
 const DB_PATH = path.join(__dirname, '../../data/bazi_consultant.db');
@@ -423,9 +424,18 @@ class DatabaseService {
         }
 
         console.log('[DB] Default admin seeding enabled. Checking default admin accounts...');
+        const hashPassword = (password) => crypto.createHash('sha256').update(password).digest('hex');
         const admins = [
-            { email: 'admin@huyencobattu.vn', hash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'Administrator' },
-            { email: 'admin@admin.com', hash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'System Admin' }
+            {
+                email: 'quangld@vilapa.com',
+                name: 'Administrator',
+                passwordEnv: 'SEED_ADMIN_1_PASSWORD'
+            },
+            {
+                email: 'dev@vilapa.com',
+                name: 'System Admin',
+                passwordEnv: 'SEED_ADMIN_2_PASSWORD'
+            }
         ];
 
         for (const admin of admins) {
@@ -437,11 +447,18 @@ class DatabaseService {
                 continue;
             }
 
+            const rawPassword = process.env[admin.passwordEnv];
+            if (!rawPassword) {
+                console.warn(`[DB] Missing ${admin.passwordEnv}. Skipping default admin ${email}.`);
+                continue;
+            }
+
+            const passwordHash = hashPassword(rawPassword);
             console.log(`[DB] Default admin ${email} not found. Creating...`);
             await this.run(`
                 INSERT INTO users (email, password_hash, name, credits, is_admin)
                 VALUES (?, ?, ?, 9999, 1)
-            `, [email, admin.hash, admin.name]);
+            `, [email, passwordHash, admin.name]);
             console.log(`[DB] Default admin ${email} created.`);
         }
     }
