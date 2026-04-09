@@ -72,7 +72,7 @@ const BaziChart = ({ data, isMobile }) => {
 
             {/* Can */}
             <div className={`gan-text ${getElementClass(p.can)}`}
-                style={{ fontSize: '1.6em', fontWeight: 'bold', marginBottom: '4px', cursor: 'help' }}
+                style={{ fontSize: '1.6em', fontWeight: 500, marginBottom: '4px', cursor: 'help' }}
                 title={getTooltip(p.can)}>
                 {p.can}
             </div>
@@ -82,7 +82,7 @@ const BaziChart = ({ data, isMobile }) => {
 
             {/* Chi */}
             <div className={`zhi-text ${getElementClass(p.chi)}`}
-                style={{ fontSize: '1.6em', fontWeight: 'bold', marginBottom: '8px', cursor: 'help' }}
+                style={{ fontSize: '1.6em', fontWeight: 500, marginBottom: '8px', cursor: 'help' }}
                 title={getTooltip(p.chi)}>
                 {p.chi}
             </div>
@@ -162,7 +162,7 @@ const BaziChart = ({ data, isMobile }) => {
 
                     {/* 1. Main Pillars Overlay Group */}
                     <div className="main-chart-group glass-card" id="section-chart" style={{ padding: '20px', position: 'relative', borderTop: '4px solid #3498db' }}>
-                        <div style={{ position: 'absolute', top: '10px', left: '15px', fontSize: '0.8em', color: '#3498db', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                        <div style={{ position: 'absolute', top: '10px', left: '15px', fontSize: '0.8em', color: '#3498db', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }}>
                             ★ Tứ Trụ (Giờ - Ngày - Tháng - Năm)
                         </div>
 
@@ -178,7 +178,7 @@ const BaziChart = ({ data, isMobile }) => {
                         {auxPillars.map((p, idx) => (
                             <div key={idx} className="glass-card" style={{ padding: '10px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '140px', borderTop: '3px solid #9b59b6' }}>
                                 <div style={{ fontSize: '0.75em', opacity: 0.7, marginBottom: '5px' }} title={getTooltip(p.title)}>{p.title}</div>
-                                <div style={{ fontSize: '1.1em', fontWeight: 'bold' }}>
+                                <div style={{ fontSize: '1.1em', fontWeight: 500 }}>
                                     <span className={getElementClass(p.can)} title={getTooltip(p.can)} style={{ cursor: 'help' }}>{p.can}</span>
                                     <span style={{ margin: '0 5px', opacity: 0.3 }}>-</span>
                                     <span className={getElementClass(p.chi)} title={getTooltip(p.chi)} style={{ cursor: 'help' }}>{p.chi}</span>
@@ -264,7 +264,7 @@ const BaziChart = ({ data, isMobile }) => {
                                             return (
                                                 <div key={key} className="shishen-card" style={{ background: 'rgba(255,255,255,0.03)', padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                                                     <div className="shishen-head" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.4rem', marginBottom: '0.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                        <span style={{ fontSize: '0.95em', fontWeight: 'bold', color: '#ecf0f1' }} title={group.desc}>{group.title}</span>
+                                                        <span style={{ fontSize: '0.95em', fontWeight: 500, color: '#ecf0f1' }} title={group.desc}>{group.title}</span>
                                                         <span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '10px', fontSize: '0.8em', minWidth: '20px', textAlign: 'center' }}>{group.count}</span>
                                                     </div>
                                                     {group.items.length > 0 ? (
@@ -300,7 +300,7 @@ const BaziChart = ({ data, isMobile }) => {
                                                     // Actually user requests to see them, so let's display all to complete the structure.
                                                     return (
                                                         <div key={key} style={{ marginBottom: '1.2rem' }}>
-                                                            <h5 style={{ color: '#e67e22', fontSize: '1em', fontWeight: 'bold', marginBottom: '0.5rem', borderLeft: '3px solid #e67e22', paddingLeft: '8px', textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between' }}>
+                                                            <h5 style={{ color: '#e67e22', fontSize: '1em', fontWeight: 500, marginBottom: '0.5rem', borderLeft: '3px solid #e67e22', paddingLeft: '8px', textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between' }}>
                                                                 <span>{group.title}</span>
                                                                 <span style={{ fontSize: '0.8em', fontWeight: 'normal', color: 'rgba(255,255,255,0.6)' }}>({group.count} vị trí)</span>
                                                             </h5>
@@ -360,7 +360,7 @@ const BaziChart = ({ data, isMobile }) => {
                                                     data.phan_tich.quan_he_can_chi.thien_can.map((item, idx) => (
                                                         <div key={idx} className="rel-item" style={{ marginBottom: '8px', padding: '10px', background: 'rgba(0,0,0,0.2)', borderRadius: '6px', borderLeft: item.loai.includes('Hợp') ? '3px solid #2ecc71' : '3px solid #e74c3c' }}>
                                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                <span style={{ fontWeight: 'bold', color: item.loai.includes('Hợp') ? '#2ecc71' : '#e74c3c', fontSize: '1.05em' }}>{item.loai}</span>
+                                                                <span style={{ fontWeight: 500, color: item.loai.includes('Hợp') ? '#2ecc71' : '#e74c3c', fontSize: '1.05em' }}>{item.loai}</span>
                                                                 <span style={{ fontSize: '0.8em', opacity: 0.6, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>{item.tru}</span>
                                                             </div>
                                                             <div style={{ marginTop: '6px', fontSize: '0.95em' }}>{item.chi_tiet} <span style={{ opacity: 0.6 }}>({item.ten})</span></div>
@@ -383,7 +383,7 @@ const BaziChart = ({ data, isMobile }) => {
                                                     data.phan_tich.quan_he_can_chi.dia_chi.map((item, idx) => (
                                                         <div key={idx} className="rel-item" style={{ marginBottom: '8px', padding: '10px', background: 'rgba(0,0,0,0.2)', borderRadius: '6px', borderLeft: item.loai.includes('Hợp') ? '3px solid #3498db' : (item.loai.includes('Hình') ? '3px solid #f39c12' : '3px solid #e74c3c') }}>
                                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                <span style={{ fontWeight: 'bold', color: item.loai.includes('Hợp') ? '#3498db' : (item.loai.includes('Hình') ? '#f39c12' : '#e74c3c'), fontSize: '1.05em' }}>{item.loai}</span>
+                                                                <span style={{ fontWeight: 500, color: item.loai.includes('Hợp') ? '#3498db' : (item.loai.includes('Hình') ? '#f39c12' : '#e74c3c'), fontSize: '1.05em' }}>{item.loai}</span>
                                                                 <span style={{ fontSize: '0.8em', opacity: 0.6, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>{item.tru}</span>
                                                             </div>
                                                             <div style={{ marginTop: '6px', fontSize: '0.95em' }}>{item.chi_tiet} <span style={{ opacity: 0.6 }}>({item.ten})</span></div>
@@ -452,14 +452,14 @@ const BaziChart = ({ data, isMobile }) => {
                                                 {data.phan_tich.quan_he_can_chi.manh_yeu && (
                                                     <div style={{ marginBottom: '1.2rem', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '6px', borderLeft: '3px solid #f1c40f' }}>
                                                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '8px' }}>
-                                                            <span style={{ padding: '4px 8px', borderRadius: '4px', background: data.phan_tich.quan_he_can_chi.manh_yeu.dac_lenh.status ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255, 255, 255, 0.1)', color: data.phan_tich.quan_he_can_chi.manh_yeu.dac_lenh.status ? '#2ecc71' : '#bdc3c7', fontSize: '0.85em', fontWeight: 'bold' }}>
+                                                            <span style={{ padding: '4px 8px', borderRadius: '4px', background: data.phan_tich.quan_he_can_chi.manh_yeu.dac_lenh.status ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255, 255, 255, 0.1)', color: data.phan_tich.quan_he_can_chi.manh_yeu.dac_lenh.status ? '#2ecc71' : '#bdc3c7', fontSize: '0.85em', fontWeight: 500 }}>
                                                                 {data.phan_tich.quan_he_can_chi.manh_yeu.dac_lenh.desc}
                                                             </span>
-                                                            <span style={{ padding: '4px 8px', borderRadius: '4px', background: data.phan_tich.quan_he_can_chi.manh_yeu.dac_dia.status ? 'rgba(52, 152, 219, 0.2)' : 'rgba(255, 255, 255, 0.1)', color: data.phan_tich.quan_he_can_chi.manh_yeu.dac_dia.status ? '#3498db' : '#bdc3c7', fontSize: '0.85em', fontWeight: 'bold' }}>
+                                                            <span style={{ padding: '4px 8px', borderRadius: '4px', background: data.phan_tich.quan_he_can_chi.manh_yeu.dac_dia.status ? 'rgba(52, 152, 219, 0.2)' : 'rgba(255, 255, 255, 0.1)', color: data.phan_tich.quan_he_can_chi.manh_yeu.dac_dia.status ? '#3498db' : '#bdc3c7', fontSize: '0.85em', fontWeight: 500 }}>
                                                                 {data.phan_tich.quan_he_can_chi.manh_yeu.dac_dia.desc}
                                                             </span>
                                                         </div>
-                                                        <p style={{ margin: 0, fontStyle: 'italic', fontWeight: 'bold', color: '#f1c40f', fontSize: '1.05em' }}>
+                                                        <p style={{ margin: 0, fontStyle: 'italic', fontWeight: 500, color: '#f1c40f', fontSize: '1.05em' }}>
                                                             {data.phan_tich.quan_he_can_chi.manh_yeu.ket_luan_so_bo}
                                                         </p>
                                                     </div>
@@ -471,7 +471,7 @@ const BaziChart = ({ data, isMobile }) => {
                                                     {data.phan_tich.quan_he_can_chi.can_khi && data.phan_tich.quan_he_can_chi.can_khi.map((item, idx) => (
                                                         <div key={idx} style={{ background: 'rgba(255,255,255,0.05)', padding: '8px 12px', borderRadius: '6px', border: item.is_nhat_chu ? '1px solid rgba(231, 76, 60, 0.5)' : '1px dashed rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                             <div>
-                                                                <div className={`element-text ${getElementClass(item.can)}`} style={{ fontWeight: 'bold', fontSize: '1em', cursor: 'help' }} title={getTooltip(item.can)}>{item.can}</div>
+                                                                <div className={`element-text ${getElementClass(item.can)}`} style={{ fontWeight: 500, fontSize: '1em', cursor: 'help' }} title={getTooltip(item.can)}>{item.can}</div>
                                                                 <div style={{ fontSize: '0.75em', opacity: 0.5 }}>{item.tru}</div>
                                                             </div>
 
@@ -497,7 +497,7 @@ const BaziChart = ({ data, isMobile }) => {
                                                             <div style={{ fontSize: '0.75em', textTransform: 'uppercase', opacity: 0.6, marginBottom: '4px', cursor: 'help' }} title={getTooltip(item.chi)}>{item.chi} ({item.tru})</div>
                                                             <div style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
                                                                 {item.can_tang.map((tb, i) => (
-                                                                    <span key={i} className={`element-text ${getElementClass(tb.can)}`} style={{ fontWeight: 'bold', fontSize: '0.9em', cursor: 'help' }} title={getTooltip(tb.can)}>{tb.can}</span>
+                                                                    <span key={i} className={`element-text ${getElementClass(tb.can)}`} style={{ fontWeight: 500, fontSize: '0.9em', cursor: 'help' }} title={getTooltip(tb.can)}>{tb.can}</span>
                                                                 ))}
                                                             </div>
                                                         </div>
@@ -582,10 +582,10 @@ const BaziChart = ({ data, isMobile }) => {
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem', marginBottom: '2rem' }}>
                                         {/* DỤNG THẦN */}
                                         <div style={{ background: 'linear-gradient(135deg, rgba(46, 204, 113, 0.15) 0%, rgba(46, 204, 113, 0.05) 100%)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(46, 204, 113, 0.3)' }}>
-                                            <h4 style={{ color: '#2ecc71', fontWeight: 'bold', borderBottom: '1px solid rgba(46, 204, 113, 0.3)', paddingBottom: '8px', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                                            <h4 style={{ color: '#2ecc71', fontWeight: 500, borderBottom: '1px solid rgba(46, 204, 113, 0.3)', paddingBottom: '8px', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
                                                 <span style={{ fontSize: '1.2em', marginRight: '8px' }}>💎</span> DỤNG THẦN (Cốt lõi)
                                             </h4>
-                                            <div style={{ fontSize: '1.5em', fontWeight: 'bold', margin: '10px 0', color: '#fff', textShadow: '0 0 10px rgba(46, 204, 113, 0.5)' }}>
+                                            <div style={{ fontSize: '1.5em', fontWeight: 500, margin: '10px 0', color: '#fff', textShadow: '0 0 10px rgba(46, 204, 113, 0.5)' }}>
                                                 {data.phan_tich.can_bang_ngu_hanh.dung_than.ngu_hanh.join(', ') || "Đang xét"}
                                             </div>
                                             <p style={{ fontSize: '0.9em', opacity: 0.8, marginBottom: '0' }}>{data.phan_tich.can_bang_ngu_hanh.dung_than.y_nghia}</p>
@@ -593,10 +593,10 @@ const BaziChart = ({ data, isMobile }) => {
 
                                         {/* HỶ THẦN */}
                                         <div style={{ background: 'linear-gradient(135deg, rgba(52, 152, 219, 0.15) 0%, rgba(52, 152, 219, 0.05) 100%)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(52, 152, 219, 0.3)' }}>
-                                            <h4 style={{ color: '#3498db', fontWeight: 'bold', borderBottom: '1px solid rgba(52, 152, 219, 0.3)', paddingBottom: '8px', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                                            <h4 style={{ color: '#3498db', fontWeight: 500, borderBottom: '1px solid rgba(52, 152, 219, 0.3)', paddingBottom: '8px', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
                                                 <span style={{ fontSize: '1.2em', marginRight: '8px' }}>✨</span> HỶ THẦN (Hỗ trợ)
                                             </h4>
-                                            <div style={{ fontSize: '1.5em', fontWeight: 'bold', margin: '10px 0', color: '#fff', textShadow: '0 0 10px rgba(52, 152, 219, 0.5)' }}>
+                                            <div style={{ fontSize: '1.5em', fontWeight: 500, margin: '10px 0', color: '#fff', textShadow: '0 0 10px rgba(52, 152, 219, 0.5)' }}>
                                                 {data.phan_tich.can_bang_ngu_hanh.hy_than.ngu_hanh.join(', ') || "Đang xét"}
                                             </div>
                                             <p style={{ fontSize: '0.9em', opacity: 0.8, marginBottom: '0' }}>{data.phan_tich.can_bang_ngu_hanh.hy_than.y_nghia}</p>
@@ -604,10 +604,10 @@ const BaziChart = ({ data, isMobile }) => {
 
                                         {/* KỴ THẦN */}
                                         <div style={{ background: 'linear-gradient(135deg, rgba(231, 76, 60, 0.15) 0%, rgba(231, 76, 60, 0.05) 100%)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(231, 76, 60, 0.3)' }}>
-                                            <h4 style={{ color: '#e74c3c', fontWeight: 'bold', borderBottom: '1px solid rgba(231, 76, 60, 0.3)', paddingBottom: '8px', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                                            <h4 style={{ color: '#e74c3c', fontWeight: 500, borderBottom: '1px solid rgba(231, 76, 60, 0.3)', paddingBottom: '8px', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
                                                 <span style={{ fontSize: '1.2em', marginRight: '8px' }}>🔥</span> KỴ THẦN (Cần tránh)
                                             </h4>
-                                            <div style={{ fontSize: '1.5em', fontWeight: 'bold', margin: '10px 0', color: '#fff', textShadow: '0 0 10px rgba(231, 76, 60, 0.5)' }}>
+                                            <div style={{ fontSize: '1.5em', fontWeight: 500, margin: '10px 0', color: '#fff', textShadow: '0 0 10px rgba(231, 76, 60, 0.5)' }}>
                                                 {data.phan_tich.can_bang_ngu_hanh.ky_than.ngu_hanh.join(', ') || "Đang xét"}
                                             </div>
                                             <p style={{ fontSize: '0.9em', opacity: 0.8, marginBottom: '0' }}>{data.phan_tich.can_bang_ngu_hanh.ky_than.y_nghia}</p>
@@ -621,8 +621,8 @@ const BaziChart = ({ data, isMobile }) => {
                                             <div className="glass-card" style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)' }}>
                                                 <h5 style={{ color: '#f39c12', marginBottom: '0.8rem', borderLeft: '3px solid #f39c12', paddingLeft: '8px' }}>LUẬN CÁT HUNG TỔNG THỂ</h5>
                                                 <ul className="dash-list" style={{ paddingLeft: '10px' }}>
-                                                    <li style={{ marginBottom: '8px' }}><span style={{ color: '#2ecc71', fontWeight: 'bold' }}>Vận Tốt:</span> {data.phan_tich.can_bang_ngu_hanh.cat_hung.gap_van_tot}</li>
-                                                    <li style={{ marginBottom: '8px' }}><span style={{ color: '#e74c3c', fontWeight: 'bold' }}>Vận Xấu:</span> {data.phan_tich.can_bang_ngu_hanh.cat_hung.gap_van_xau}</li>
+                                                    <li style={{ marginBottom: '8px' }}><span style={{ color: '#2ecc71', fontWeight: 500 }}>Vận Tốt:</span> {data.phan_tich.can_bang_ngu_hanh.cat_hung.gap_van_tot}</li>
+                                                    <li style={{ marginBottom: '8px' }}><span style={{ color: '#e74c3c', fontWeight: 500 }}>Vận Xấu:</span> {data.phan_tich.can_bang_ngu_hanh.cat_hung.gap_van_xau}</li>
                                                 </ul>
                                             </div>
                                         )}
@@ -679,7 +679,7 @@ const BaziChart = ({ data, isMobile }) => {
 
                                                         return (
                                                             <div key={idx} style={{ background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '6px' }}>
-                                                                <div style={{ color: '#81ecec', fontWeight: 'bold', marginBottom: '4px', textTransform: 'uppercase', fontSize: '0.85em' }}>{label}</div>
+                                                                <div style={{ color: '#81ecec', fontWeight: 500, marginBottom: '4px', textTransform: 'uppercase', fontSize: '0.85em' }}>{label}</div>
                                                                 <div style={{ color: '#fff' }}>{content}</div>
                                                             </div>
                                                         );
@@ -795,12 +795,12 @@ const BaziChart = ({ data, isMobile }) => {
                             <div className="box-content">
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
                                     <div style={{ background: 'rgba(46, 204, 113, 0.1)', padding: '1rem', borderRadius: '10px', textAlign: 'center' }}>
-                                        <div style={{ color: '#2ecc71', fontSize: '0.8em', fontWeight: 'bold' }}>🧭 HƯỚNG TỐT</div>
-                                        <div style={{ fontSize: '1.2em', fontWeight: 'bold' }}>{data.phan_tich.suc_khoe.huong_tot}</div>
+                                        <div style={{ color: '#2ecc71', fontSize: '0.8em', fontWeight: 500 }}>🧭 HƯỚNG TỐT</div>
+                                        <div style={{ fontSize: '1.2em', fontWeight: 500 }}>{data.phan_tich.suc_khoe.huong_tot}</div>
                                     </div>
                                     <div style={{ background: 'rgba(46, 204, 113, 0.1)', padding: '1rem', borderRadius: '10px', textAlign: 'center' }}>
-                                        <div style={{ color: '#2ecc71', fontSize: '0.8em', fontWeight: 'bold' }}>🎨 MÀU MAY MẮN</div>
-                                        <div style={{ fontSize: '1.2em', fontWeight: 'bold' }}>{data.phan_tich.suc_khoe.mau_may_man}</div>
+                                        <div style={{ color: '#2ecc71', fontSize: '0.8em', fontWeight: 500 }}>🎨 MÀU MAY MẮN</div>
+                                        <div style={{ fontSize: '1.2em', fontWeight: 500 }}>{data.phan_tich.suc_khoe.mau_may_man}</div>
                                     </div>
                                 </div>
                                 <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px', borderLeft: '4px solid #2ecc71' }}>
@@ -936,7 +936,7 @@ const DataCard = ({ title, icon, headerColor, dataObj }) => {
 
             // Highlight/Header: ♦ or Starts with uppercase usually
             if (processed.startsWith('♦')) {
-                return `<div style="color:${headerColor}; font-weight:bold; margin-top:6px; margin-bottom:2px; padding-bottom:2px">${processed}</div>`;
+                return `<div style="color:${headerColor}; font-weight:500; margin-top:6px; margin-bottom:2px; padding-bottom:2px">${processed}</div>`;
             }
 
             // List items: ➤, -, >
@@ -952,14 +952,14 @@ const DataCard = ({ title, icon, headerColor, dataObj }) => {
 
     return (
         <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: `1px solid ${headerColor}40`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <h4 style={{ background: `${headerColor}20`, color: headerColor, padding: '12px 16px', margin: 0, borderBottom: `1px solid ${headerColor}40`, fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+            <h4 style={{ background: `${headerColor}20`, color: headerColor, padding: '12px 16px', margin: 0, borderBottom: `1px solid ${headerColor}40`, fontWeight: 500, display: 'flex', alignItems: 'center' }}>
                 <span style={{ marginRight: '8px', fontSize: '1.2em' }}>{icon}</span> {title}
             </h4>
             <div style={{ padding: '16px', flex: 1 }}>
 
                 {/* 1. BIẾN SỐ */}
                 <div style={{ marginBottom: '16px' }}>
-                    <div style={{ fontSize: '0.8em', textTransform: 'uppercase', color: '#bdc3c7', fontWeight: 'bold', marginBottom: '8px', letterSpacing: '1px' }}>🔹 PHÂN TÍCH BIẾN SỐ</div>
+                    <div style={{ fontSize: '0.8em', textTransform: 'uppercase', color: '#bdc3c7', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>🔹 PHÂN TÍCH BIẾN SỐ</div>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                         {dataObj.variables && dataObj.variables.map((v, i) => (
                             <li key={i} style={{ fontSize: '0.9em', color: '#ecf0f1', padding: '4px 0', borderBottom: '1px dashed rgba(255,255,255,0.1)' }} dangerouslySetInnerHTML={{ __html: formatText(v) }}></li>
@@ -969,7 +969,7 @@ const DataCard = ({ title, icon, headerColor, dataObj }) => {
 
                 {/* 2. HỘI TỤ */}
                 <div style={{ marginBottom: '16px' }}>
-                    <div style={{ fontSize: '0.8em', textTransform: 'uppercase', color: '#bdc3c7', fontWeight: 'bold', marginBottom: '8px', letterSpacing: '1px' }}>🔹 HỘI TỤ PHÂN TÍCH</div>
+                    <div style={{ fontSize: '0.8em', textTransform: 'uppercase', color: '#bdc3c7', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>🔹 HỘI TỤ PHÂN TÍCH</div>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                         {dataObj.convergence && dataObj.convergence.map((c, i) => (
                             <li key={i} style={{ fontSize: '0.9em', color: '#ecf0f1', padding: '4px 0', display: 'flex' }}>
@@ -982,7 +982,7 @@ const DataCard = ({ title, icon, headerColor, dataObj }) => {
 
                 {/* 3. LUẬN GIẢI */}
                 <div>
-                    <div style={{ fontSize: '0.8em', textTransform: 'uppercase', color: '#bdc3c7', fontWeight: 'bold', marginBottom: '8px', letterSpacing: '1px' }}>🔹 LUẬN GIẢI (CÓ ĐIỀU KIỆN)</div>
+                    <div style={{ fontSize: '0.8em', textTransform: 'uppercase', color: '#bdc3c7', fontWeight: 500, marginBottom: '8px', letterSpacing: '1px' }}>🔹 LUẬN GIẢI (CÓ ĐIỀU KIỆN)</div>
                     <div style={{ background: `${headerColor}10`, padding: '12px', borderRadius: '8px', borderLeft: `3px solid ${headerColor}`, fontSize: '0.95em', color: '#ecf0f1', lineHeight: '1.6', fontStyle: 'italic' }}>
                         <div dangerouslySetInnerHTML={{ __html: formatText(dataObj.conclusion) }} />
                     </div>
@@ -997,7 +997,7 @@ const DataCard = ({ title, icon, headerColor, dataObj }) => {
 
 const ReportSection = ({ title, children }) => (
     <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: '#ecf0f1', fontSize: '1.1em', fontWeight: 'bold', marginBottom: '1rem', borderLeft: '4px solid #3498db', paddingLeft: '10px' }}>{title}</h4>
+        <h4 style={{ color: '#ecf0f1', fontSize: '1.1em', fontWeight: 500, marginBottom: '1rem', borderLeft: '4px solid #3498db', paddingLeft: '10px' }}>{title}</h4>
         <div style={{ paddingLeft: '10px' }}>{children}</div>
     </div>
 );
@@ -1040,7 +1040,7 @@ const DetailedReport = ({ report, isMobile }) => {
                         <ul className="dash-list" style={{ marginTop: '5px' }}>{report.phan_2_luc_khi.xung_pha.map((l, i) => <li key={i}>{l}</li>)}</ul>
                     </div>
                 </div>
-                <p className="conclusion-text" style={{ color: '#f1c40f', fontWeight: 'bold', marginTop: '10px', fontSize: '1.1em' }}>📌 Kết luận lực: {report.phan_2_luc_khi.ket_luan}</p>
+                <p className="conclusion-text" style={{ color: '#f1c40f', fontWeight: 500, marginTop: '10px', fontSize: '1.1em' }}>📌 Kết luận lực: {report.phan_2_luc_khi.ket_luan}</p>
             </ReportSection>
 
             <div className="divider-line" style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '1.5rem 0' }}></div>
@@ -1051,7 +1051,7 @@ const DetailedReport = ({ report, isMobile }) => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {report.phan_3_tinh_chat.bang_y_nghia.map((row, i) => (
                             <div key={i} style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '8px', borderLeft: '3px solid #3498db' }}>
-                                <div style={{ fontWeight: 'bold', color: '#ecf0f1', marginBottom: '4px' }}>{row.quan_he}</div>
+                                <div style={{ fontWeight: 500, color: '#ecf0f1', marginBottom: '4px' }}>{row.quan_he}</div>
                                 <div style={{ fontSize: '0.9em', opacity: 0.9, lineHeight: '1.4' }}>{row.y_nghia}</div>
                             </div>
                         ))}
@@ -1067,7 +1067,7 @@ const DetailedReport = ({ report, isMobile }) => {
                         <tbody>
                             {report.phan_3_tinh_chat.bang_y_nghia.map((row, i) => (
                                 <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <td style={{ padding: '10px', fontWeight: 'bold', color: '#ecf0f1' }}>{row.quan_he}</td>
+                                    <td style={{ padding: '10px', fontWeight: 500, color: '#ecf0f1' }}>{row.quan_he}</td>
                                     <td style={{ padding: '10px', opacity: 0.9 }}>{row.y_nghia}</td>
                                 </tr>
                             ))}
@@ -1091,7 +1091,7 @@ const DetailedReport = ({ report, isMobile }) => {
                         {report.phan_4_vi_tri.phan_tich.map((row, i) => (
                             <div key={i} style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '8px', borderLeft: '3px solid #e74c3c' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                    <span style={{ fontWeight: 'bold', color: '#ecf0f1' }}>{row.xung_hop}</span>
+                                    <span style={{ fontWeight: 500, color: '#ecf0f1' }}>{row.xung_hop}</span>
                                     <span style={{ fontSize: '0.8em', opacity: 0.7 }}>{row.tru}</span>
                                 </div>
                                 <div style={{ fontSize: '0.9em', opacity: 0.9, lineHeight: '1.4' }}>{row.ung}</div>
@@ -1111,7 +1111,7 @@ const DetailedReport = ({ report, isMobile }) => {
                             <tbody>
                                 {report.phan_4_vi_tri.phan_tich.map((row, i) => (
                                     <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                        <td style={{ padding: '10px', fontWeight: 'bold' }}>{row.xung_hop}</td>
+                                        <td style={{ padding: '10px', fontWeight: 500 }}>{row.xung_hop}</td>
                                         <td style={{ padding: '10px' }}>{row.tru}</td>
                                         <td style={{ padding: '10px', opacity: 0.9 }}>{row.ung}</td>
                                     </tr>
@@ -1120,7 +1120,7 @@ const DetailedReport = ({ report, isMobile }) => {
                         </table>
                     </div>
                 )}
-                <p className="conclusion-text" style={{ color: '#e74c3c', marginTop: '10px', fontWeight: 'bold', fontSize: isMobile ? '0.95em' : '1em' }}>{report.phan_4_vi_tri.ket_luan}</p>
+                <p className="conclusion-text" style={{ color: '#e74c3c', marginTop: '10px', fontWeight: 500, fontSize: isMobile ? '0.95em' : '1em' }}>{report.phan_4_vi_tri.ket_luan}</p>
             </ReportSection>
 
             <div className="divider-line" style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '1.5rem 0' }}></div>
@@ -1133,7 +1133,7 @@ const DetailedReport = ({ report, isMobile }) => {
                 </ul>
                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '8px' }}>
                     <div style={{ marginBottom: '8px' }}>
-                        <b>📌 Vai trò:</b> <span style={{ color: '#3498db', fontWeight: 'bold' }}>{report.phan_5_chu_khach.vai_tro}</span>
+                        <b>📌 Vai trò:</b> <span style={{ color: '#3498db', fontWeight: 500 }}>{report.phan_5_chu_khach.vai_tro}</span>
                     </div>
                     <div>
                         <b>Xu hướng:</b> <span style={{ opacity: 0.9, fontStyle: 'italic' }}>{report.phan_5_chu_khach.xu_huong}</span>
@@ -1152,7 +1152,7 @@ const DetailedReport = ({ report, isMobile }) => {
                 </div>
                 {report.phan_6_ung_su.co_quyet.length > 0 && (
                     <div className="scroll-paper" style={{ marginTop: '1.5rem', fontStyle: 'italic', opacity: 0.8, borderLeft: '3px solid #95a5a6', paddingLeft: '15px' }}>
-                        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>📜 Cổ quyết:</div>
+                        <div style={{ fontWeight: 500, marginBottom: '5px' }}>📜 Cổ quyết:</div>
                         {report.phan_6_ung_su.co_quyet.map((q, i) => <div key={i} style={{ marginBottom: '3px' }}>{q}</div>)}
                     </div>
                 )}

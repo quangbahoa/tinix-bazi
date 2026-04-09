@@ -13,7 +13,7 @@
     color: var(--accent-gold);
     font-size: 1.4rem;
     margin-bottom: 1rem;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .matching-page {
@@ -114,7 +114,7 @@
     font-size: 1.5rem;
     color: var(--gold);
     margin-bottom: 0.5rem;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .ro-details {
@@ -673,7 +673,7 @@
     min-width: 400px;
     padding: 0.8rem 2rem;
     white-space: nowrap;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-primary);
     font-weight: 500;
     font-size: 0.9rem;
     border-radius: 50px;
@@ -849,7 +849,7 @@
 .item-score {
     float: right;
     color: var(--gold);
-    font-weight: 700;
+    font-weight: 500;
 }
 
 /* Aspects Section */
@@ -917,7 +917,7 @@
 .ask-btn {
     align-self: flex-end;
     padding: 1.1rem 2.8rem;
-    font-weight: 900;
+    font-weight: 500;
     font-size: 1.15rem;
     border-radius: 60px;
     background: linear-gradient(135deg, #ffd700, #ffeb3b);
@@ -983,12 +983,12 @@
 .ai-heading {
     color: var(--accent-gold);
     margin: 1.5rem 0 1rem 0;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .ai-bold {
     color: var(--accent-gold);
-    font-weight: 700;
+    font-weight: 500;
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
 }
 
@@ -1027,7 +1027,7 @@
 .cursor-blink {
     color: var(--accent-gold);
     animation: blink 1s step-end infinite;
-    font-weight: bold;
+    font-weight: 500;
     margin-left: 2px;
 }
 

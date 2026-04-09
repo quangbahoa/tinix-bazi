@@ -122,7 +122,7 @@ const QueShareCard = forwardRef(({ data, topic }, ref) => {
                             padding: '0.2rem 0.7rem',
                             borderRadius: '50px',
                             fontSize: '0.75rem',
-                            fontWeight: 'bold',
+                            fontWeight: 500,
                             background: `rgba(${getQualityClass(data.quality) === 'quality-good' ? '46, 204, 113' : getQualityClass(data.quality) === 'quality-neutral' ? '255, 193, 7' : '231, 76, 60'}, 0.2)`,
                             color: getQualityColor(data.quality),
                             border: `1px solid ${getQualityColor(data.quality)}40`
@@ -173,7 +173,7 @@ const QueShareCard = forwardRef(({ data, topic }, ref) => {
                 }}>
                     {advice.positives.length > 0 && (
                         <div style={{ flex: 1, color: '#2ecc71' }}>
-                            <div style={{ marginBottom: '0.3rem', fontWeight: 'bold' }}>✅ Nên</div>
+                            <div style={{ marginBottom: '0.3rem', fontWeight: 500 }}>✅ Nên</div>
                             <div style={{ color: 'rgba(255,255,255,0.7)' }}>
                                 {advice.positives.join(', ')}
                             </div>
@@ -181,7 +181,7 @@ const QueShareCard = forwardRef(({ data, topic }, ref) => {
                     )}
                     {advice.cautions.length > 0 && (
                         <div style={{ flex: 1, color: '#e74c3c' }}>
-                            <div style={{ marginBottom: '0.3rem', fontWeight: 'bold' }}>⚠️ Tránh</div>
+                            <div style={{ marginBottom: '0.3rem', fontWeight: 500 }}>⚠️ Tránh</div>
                             <div style={{ color: 'rgba(255,255,255,0.7)' }}>
                                 {advice.cautions.join(', ')}
                             </div>
