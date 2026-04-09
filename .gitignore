@@ -33,3 +33,4 @@ npm-debug.log*
 .cursor/*
 /.cursor/*
 .cursor/project.md
+/.cursor
