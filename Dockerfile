@@ -16,6 +16,8 @@ RUN npm run build
 FROM node:20-alpine AS production
 WORKDIR /app
 
+RUN apk add --no-cache sqlite nano
+
 COPY package.json package-lock.json ./
 COPY frontend/package.json ./frontend/
 COPY backendjs/package.json ./backendjs/
