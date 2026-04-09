@@ -8,9 +8,34 @@ const router = express.Router();
 const dbService = require('../services/database.service');
 const { authMiddleware, adminMiddleware } = require('./auth.routes');
 
-// Apply protection to all admin routes
-router.use(authMiddleware);
-router.use(adminMiddleware);
+const parseApiKeyFromAuthorization = (authorization) => {
+    if (!authorization || typeof authorization !== 'string') return null;
+    const match = authorization.match(/^ApiKey\s+(.+)$/i);
+    return match ? match[1].trim() : null;
+};
+
+const manageKeyMiddleware = (req, res, next) => {
+    const manageKey = process.env.API_KEY_MANAGE;
+    const apiKey = parseApiKeyFromAuthorization(req.headers.authorization);
+    if (manageKey && apiKey && apiKey === manageKey) {
+        req.user = { id: 0, email: 'manage-key@system', is_admin: 1, role: 'admin' };
+        req.authType = 'manage_key';
+    }
+    next();
+};
+
+// Apply protection to all admin routes:
+// - Either API_KEY_MANAGE
+// - Or normal admin session
+router.use(manageKeyMiddleware);
+router.use((req, res, next) => {
+    if (req.authType === 'manage_key') return next();
+    return authMiddleware(req, res, next);
+});
+router.use((req, res, next) => {
+    if (req.authType === 'manage_key') return next();
+    return adminMiddleware(req, res, next);
+});
 
 // ========== CATEGORIES ==========
 
@@ -189,6 +214,55 @@ router.put('/users/:id/credits', async (req, res) => {
         res.json({ message: 'Credits updated' });
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// PUT update user profile/status by admin
+router.put('/users/:id', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const updated = await dbService.updateUserByAdmin(userId, req.body || {});
+        res.json({ message: 'User updated', user: updated });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// POST deposit credits for a user
+router.post('/users/:id/credits/deposit', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const amount = Number(req.body?.amount);
+        const description = req.body?.description || 'Admin nạp credits';
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            return res.status(400).json({ error: 'amount phải là số dương' });
+        }
+
+        await dbService.depositCredits(userId, amount, description);
+        const user = await dbService.getUserById(userId);
+        res.json({ message: 'Deposit thành công', user });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// POST withdraw credits from a user
+router.post('/users/:id/credits/withdraw', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const amount = Number(req.body?.amount);
+        const description = req.body?.description || 'Admin trừ credits';
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            return res.status(400).json({ error: 'amount phải là số dương' });
+        }
+
+        await dbService.withdrawCredits(userId, amount, description);
+        const user = await dbService.getUserById(userId);
+        res.json({ message: 'Withdraw thành công', user });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 });
 

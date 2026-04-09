@@ -21,7 +21,15 @@ const ArticlePage = () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/${slug}`);
+            const authToken = localStorage.getItem('auth_token');
+            if (!authToken) {
+                setError('Vui lòng đăng nhập để xem bài viết');
+                setLoading(false);
+                return;
+            }
+            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/${slug}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
             const data = await res.json();
             if (data.success) {
                 setArticle(data.article);

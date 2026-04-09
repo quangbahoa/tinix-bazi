@@ -843,7 +843,11 @@ const ArticlesAdminPage = () => {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/categories`);
+            const authToken = token || localStorage.getItem('auth_token');
+            if (!authToken) return;
+            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/categories`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
             const data = await res.json();
             if (data.success) setCategories(data.categories || []);
         } catch (err) { console.error(err); }

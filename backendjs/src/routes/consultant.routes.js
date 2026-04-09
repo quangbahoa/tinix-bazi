@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
+const rateLimitCfg = require('../config/rateLimit.env');
 const { THEMES, QUESTIONS } = require('../bazi/questions/data');
 const { solveQuestion } = require('../bazi/questions/engine');
 const baziCalculator = require('../bazi/calculator');
@@ -17,10 +18,10 @@ const CREDIT_COST_PREDEFINED = 10;   // Click vào câu hỏi có sẵn
 const CREDIT_COST_AI = 50;            // Sử dụng AI (không dùng hiện tại)
 const CREDIT_COST_CUSTOM = 25;        // Điền câu hỏi tự do vào form
 
-// AI Rate Limiter for heavy endpoints
+// AI Rate Limiter for heavy endpoints (same limits as RATE_LIMIT_AI_* in .env)
 const aiLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 15, // 15 requests per minute
+    windowMs: rateLimitCfg.aiWindowMs,
+    max: rateLimitCfg.aiMax,
     message: { error: 'Quá nhiều request AI, vui lòng chờ 1 phút' },
     standardHeaders: true,
     legacyHeaders: false,
@@ -312,7 +313,7 @@ router.post('/ask', authRoutes.authMiddleware, aiLimiter, async (req, res) => {
 
 // GET /api/consultant/history/:customerId
 // GET /api/consultant/history/:customerId
-router.get('/history/:customerId', async (req, res) => {
+router.get('/history/:customerId', authRoutes.authMiddleware, async (req, res) => {
     try {
         const customerId = parseInt(req.params.customerId);
         const history = await dbService.getCustomerHistory(customerId);
@@ -330,7 +331,7 @@ router.get('/history/:customerId', async (req, res) => {
 
 // GET /api/consultant/stats
 // GET /api/consultant/stats
-router.get('/stats', async (req, res) => {
+router.get('/stats', authRoutes.authMiddleware, async (req, res) => {
     try {
         const stats = await dbService.getStats();
         res.json(stats);
@@ -342,7 +343,7 @@ router.get('/stats', async (req, res) => {
 
 // GET /api/consultant/customers
 // GET /api/consultant/customers
-router.get('/customers', async (req, res) => {
+router.get('/customers', authRoutes.authMiddleware, async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 100;
         const customers = await dbService.getAllCustomers(limit);

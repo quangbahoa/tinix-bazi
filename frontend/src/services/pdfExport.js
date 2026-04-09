@@ -98,10 +98,10 @@ const createPDFContent = (data, options) => {
             .text-xl { font-size: 16px; }
 
             .font-bold { font-weight: 700; }
-            .font-extrabold { font-weight: 800; }
+            .font-extrabold { font-weight: 500; }
             
             .header { background: linear-gradient(135deg, #d4af37, #aa8a2e); padding: 14px 20px; border-radius: 6px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-            .header .title { color: #000; font-size: 16px; font-weight: 800; letter-spacing: 2px; }
+            .header .title { color: #000; font-size: 16px; font-weight: 500; letter-spacing: 2px; }
             .header .subtitle { color: rgba(0,0,0,0.6); font-size: 9px; }
             .header .info { color: #000; font-size: 9px; text-align: right; }
             
@@ -146,7 +146,7 @@ const createPDFContent = (data, options) => {
             .el-box.earth { border-color: #f1c40f; }
             .el-box .icon { font-size: 8px; color: #666; }
             .el-box .name { font-size: 9px; font-weight: 600; }
-            .el-box .score { font-size: 12px; font-weight: 800; }
+            .el-box .score { font-size: 12px; font-weight: 500; }
             
             .wood { color: #2ecc71; }
             .fire { color: #e74c3c; }
@@ -161,9 +161,9 @@ const createPDFContent = (data, options) => {
             .pillar-card { background: #111; border: 1px solid #222; border-radius: 8px; padding: 10px 6px; text-align: center; }
             .pillar-card.main { border-color: #d4af37; background: rgba(212,175,55,0.05); }
             .pillar-label { font-size: 7px; color: #666; margin-bottom: 8px; letter-spacing: 0.5px; }
-            .pillar-can { font-size: 16px; font-weight: 800; line-height: 1.1; }
+            .pillar-can { font-size: 16px; font-weight: 500; line-height: 1.1; }
             .pillar-sep { font-size: 8px; color: #333; margin: 2px 0; }
-            .pillar-chi { font-size: 16px; font-weight: 800; line-height: 1.1; margin-bottom: 8px; }
+            .pillar-chi { font-size: 16px; font-weight: 500; line-height: 1.1; margin-bottom: 8px; }
             .pillar-shishen { font-size: 8px; color: #d4af37; font-weight: 600; margin-bottom: 2px; }
             .pillar-tang { font-size: 7px; color: #555; }
             

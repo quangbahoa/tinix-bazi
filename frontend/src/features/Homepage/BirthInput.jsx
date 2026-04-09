@@ -4,11 +4,7 @@ import QuickDivination from './QuickDivination';
 
 import DatePicker from './DatePicker';
 import Toast from '../../components/Toast';
-import RecentCustomers from '../../components/RecentCustomers';
-import SuggestedQuestions from '../../components/SuggestedQuestions';
 import UserProfileModal from '../../components/UserProfileModal';
-import SampleShowcase from '../../components/SampleShowcase';
-import ArticlesSection from '../../components/ArticlesSection';
 import AuthModal from '../../components/AuthModal';
 import { useAuth } from '../../context/AuthContext';
 import { API_CONFIG } from '../../config/api';
@@ -320,17 +316,6 @@ const BirthInput = ({ onAnalyze, loading }) => {
             </form>
 
             <QuickDivination />
-
-            <SuggestedQuestions />
-
-
-            <SampleShowcase />
-
-            <ArticlesSection />
-
-            {/* Daily Feature Removed */}
-
-            <RecentCustomers />
 
             {showProfileModal && createPortal(
                 <UserProfileModal

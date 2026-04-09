@@ -114,7 +114,7 @@ const createHTMLContent = (data) => {
             .lbl { background: linear-gradient(90deg, rgba(212,175,55,0.15) 0%, transparent 100%); font-weight: 700; color: #D4AF37; text-align: left !important; width: 90px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-right: 2px solid rgba(212,175,55,0.3); }
             .hl { background: linear-gradient(180deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.05) 100%); }
             .bazi { font-size: 32px; font-weight: 900; line-height: 1.15; padding: 15px 8px !important; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-            .section-title { background: linear-gradient(90deg, #D4AF37 0%, #aa8a2e 100%); color: #000; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 15px; border-radius: 8px 8px 0 0; text-align: center; }
+            .section-title { background: linear-gradient(90deg, #D4AF37 0%, #aa8a2e 100%); color: #000; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 15px; border-radius: 8px 8px 0 0; text-align: center; }
             .luck-cell { padding: 8px 4px !important; transition: all 0.2s; }
             .luck-cell.current { background: linear-gradient(180deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.1) 100%); border: 2px solid #D4AF37; border-radius: 8px; }
         </style>
@@ -154,7 +154,7 @@ const createHTMLContent = (data) => {
                         <td class="lbl">CHỦ TINH</td>
                         <td style="color: #888; font-size: 12px;">${yearP.thap_than_can || '—'}</td>
                         <td style="color: #888; font-size: 12px;">${monthP.thap_than_can || '—'}</td>
-                        <td class="hl" style="font-weight: 800; color: #D4AF37; font-size: 12px;">NHẬT CHỦ</td>
+                        <td class="hl" style="font-weight: 500; color: #D4AF37; font-size: 12px;">NHẬT CHỦ</td>
                         <td style="color: #888; font-size: 12px;">${hourP.thap_than_can || '—'}</td>
                     </tr>
                     <tr style="background: rgba(0,0,0,0.2);">
@@ -205,8 +205,8 @@ const createHTMLContent = (data) => {
         const { can, chi } = splitCanChi(dv.can_chi);
         const isCurrent = currentYear >= dv.nam && currentYear < dv.nam + 10;
         return `<td class="luck-cell ${isCurrent ? 'current' : ''}">
-                                <div style="font-size: 16px; font-weight: 800; color:${getColor(can)}">${can}</div>
-                                <div style="font-size: 16px; font-weight: 800; color:${getColor(chi)}">${chi}</div>
+                                <div style="font-size: 16px; font-weight: 500; color:${getColor(can)}">${can}</div>
+                                <div style="font-size: 16px; font-weight: 500; color:${getColor(chi)}">${chi}</div>
                                 <div style="font-size: 9px; color: #888; margin-top: 5px;">${dv.tuoi_bat_dau || ''}t · ${dv.nam || ''}</div>
                             </td>`;
     }).join('')}

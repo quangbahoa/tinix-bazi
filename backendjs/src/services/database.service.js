@@ -187,12 +187,43 @@ class DatabaseService {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
+                username TEXT UNIQUE,
                 name TEXT,
                 credits INTEGER DEFAULT 100,
                 is_admin INTEGER DEFAULT 0,
+                status TEXT DEFAULT 'active',
                 bazi_data TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 last_login DATETIME
+            )
+        `);
+
+        // Migration: add username/status for legacy databases
+        const userColumns = await this.all(`PRAGMA table_info(users)`);
+        const userColumnNames = userColumns.map(c => c.name);
+        if (!userColumnNames.includes('username')) {
+            console.log('[DB] Migrating users: adding username');
+            await this.run(`ALTER TABLE users ADD COLUMN username TEXT`);
+        }
+        if (!userColumnNames.includes('status')) {
+            console.log('[DB] Migrating users: adding status');
+            await this.run(`ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'active'`);
+            await this.run(`UPDATE users SET status = 'active' WHERE status IS NULL OR TRIM(status) = ''`);
+        }
+
+        // Per-user API keys
+        await this.run(`
+            CREATE TABLE IF NOT EXISTS user_api_keys (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                key_prefix TEXT NOT NULL,
+                key_hash TEXT UNIQUE NOT NULL,
+                name TEXT DEFAULT 'default',
+                is_active INTEGER DEFAULT 1,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                last_used_at DATETIME,
+                revoked_at DATETIME,
+                FOREIGN KEY (user_id) REFERENCES users(id)
             )
         `);
 
@@ -313,10 +344,14 @@ class DatabaseService {
         await this.run(`CREATE INDEX IF NOT EXISTS idx_customers_birth ON customers(year, month, day)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_questions_category ON custom_questions(category_id)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
+        await this.run(`CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)`);
+        await this.run(`CREATE INDEX IF NOT EXISTS idx_users_status ON users(status)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_credit_trans_user ON credit_transactions(user_id)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_credit_requests_status ON credit_requests(status)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`);
+        await this.run(`CREATE INDEX IF NOT EXISTS idx_user_api_keys_user ON user_api_keys(user_id)`);
+        await this.run(`CREATE INDEX IF NOT EXISTS idx_user_api_keys_hash ON user_api_keys(key_hash)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category_id)`);
         await this.run(`CREATE INDEX IF NOT EXISTS idx_articles_published ON articles(is_published)`);
@@ -545,12 +580,14 @@ class DatabaseService {
         });
     }
 
+
     /**
      * Get customer by ID
      */
     async getCustomer(customerId) {
         return this.get(`SELECT * FROM customers WHERE id = ?`, [customerId]);
     }
+
 
     /**
      * Get all customers
@@ -872,16 +909,20 @@ class DatabaseService {
 
     // ========== ACCOUNTS & AUTH ==========
 
-    async createUser(email, passwordHash, name = '') {
+    async createUser(email, passwordHash, name = '', username = '', status = 'active') {
         console.log(`[DB] Creating user: ${email}`);
         const existing = await this.getUserByEmail(email);
         if (existing) throw new Error('Email đã được sử dụng');
+        if (username) {
+            const existingUsername = await this.getUserByUsername(username);
+            if (existingUsername) throw new Error('Username đã được sử dụng');
+        }
 
         try {
             const result = await this.run(`
-                INSERT INTO users (email, password_hash, name, credits)
-                VALUES (?, ?, ?, 100)
-            `, [email, passwordHash, name]);
+                INSERT INTO users (email, password_hash, username, name, credits, status)
+                VALUES (?, ?, ?, ?, 100, ?)
+            `, [email, passwordHash, username || null, name, status || 'active']);
 
             console.log(`[DB] User created: ${email} (ID: ${result.id})`);
             await this.logCreditTransaction(result.id, 100, 'INITIAL', 'Linh thạch khởi tạo');
@@ -896,6 +937,10 @@ class DatabaseService {
         return this.get(`SELECT * FROM users WHERE email = ?`, [email]);
     }
 
+    async getUserByUsername(username) {
+        return this.get(`SELECT * FROM users WHERE username = ?`, [username]);
+    }
+
     async getUserById(id) {
         return this.get(`SELECT * FROM users WHERE id = ?`, [id]);
     }
@@ -907,6 +952,25 @@ class DatabaseService {
 
         await this.run(`UPDATE users SET credits = credits - ? WHERE id = ?`, [amount, userId]);
         await this.logCreditTransaction(userId, -amount, 'SPEND', description);
+    }
+
+    async depositCredits(userId, amount, description) {
+        const user = await this.getUserById(userId);
+        if (!user) throw new Error('User not found');
+        if (!Number.isFinite(amount) || amount <= 0) throw new Error('Số credits không hợp lệ');
+
+        await this.run(`UPDATE users SET credits = credits + ? WHERE id = ?`, [amount, userId]);
+        await this.logCreditTransaction(userId, amount, 'DEPOSIT', description || 'Nạp credits');
+    }
+
+    async withdrawCredits(userId, amount, description) {
+        const user = await this.getUserById(userId);
+        if (!user) throw new Error('User not found');
+        if (!Number.isFinite(amount) || amount <= 0) throw new Error('Số credits không hợp lệ');
+        if (user.credits < amount) throw new Error('Không đủ linh thạch');
+
+        await this.run(`UPDATE users SET credits = credits - ? WHERE id = ?`, [amount, userId]);
+        await this.logCreditTransaction(userId, -amount, 'WITHDRAW', description || 'Trừ credits');
     }
 
     async updateUserBaziData(userId, data) {
@@ -962,9 +1026,16 @@ class DatabaseService {
     }
 
     async updateUserProfile(userId, data) {
-        const { name } = data;
+        const { name, username } = data;
         if (name) {
             await this.run(`UPDATE users SET name = ? WHERE id = ?`, [name, userId]);
+        }
+        if (username) {
+            const existing = await this.getUserByUsername(username);
+            if (existing && existing.id !== userId) {
+                throw new Error('Username đã được sử dụng');
+            }
+            await this.run(`UPDATE users SET username = ? WHERE id = ?`, [username, userId]);
         }
     }
 
@@ -994,7 +1065,7 @@ class DatabaseService {
         const total = countRow ? countRow.total : 0;
 
         params.push(limit, offset);
-        const users = await this.all(`SELECT id, email, name, credits, is_admin, created_at, last_login FROM users ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`, params);
+        const users = await this.all(`SELECT id, email, username, name, credits, is_admin, status, created_at, last_login FROM users ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`, params);
 
         return { users, total, page, limit };
     }
@@ -1015,6 +1086,38 @@ class DatabaseService {
         if (diff !== 0) {
             await this.logCreditTransaction(userId, diff, 'ADMIN_ADJUST', description);
         }
+    }
+
+    async updateUserByAdmin(userId, data = {}) {
+        const user = await this.getUserById(userId);
+        if (!user) throw new Error('User not found');
+
+        const updates = [];
+        const params = [];
+
+        if (data.name !== undefined) {
+            updates.push('name = ?');
+            params.push(data.name);
+        }
+        if (data.username !== undefined) {
+            const existing = await this.getUserByUsername(data.username);
+            if (existing && existing.id !== userId) throw new Error('Username đã được sử dụng');
+            updates.push('username = ?');
+            params.push(data.username || null);
+        }
+        if (data.status !== undefined) {
+            if (!['active', 'inactive'].includes(data.status)) {
+                throw new Error('Trạng thái không hợp lệ');
+            }
+            updates.push('status = ?');
+            params.push(data.status);
+        }
+
+        if (!updates.length) return user;
+
+        params.push(userId);
+        await this.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, params);
+        return this.getUserById(userId);
     }
 
     // ========== ADMIN: CREDIT REQUESTS ==========
@@ -1070,6 +1173,27 @@ class DatabaseService {
             pending_requests: pendingCount?.count || 0,
             system_total_credits: systemicCredits?.sum || 0
         };
+    }
+
+    async createUserApiKey(userId, keyPrefix, keyHash, name = 'default') {
+        const result = await this.run(`
+            INSERT INTO user_api_keys (user_id, key_prefix, key_hash, name)
+            VALUES (?, ?, ?, ?)
+        `, [userId, keyPrefix, keyHash, name]);
+        return result.id;
+    }
+
+    async getUserApiKeyByHash(keyHash) {
+        return this.get(`
+            SELECT k.*, u.id as user_id_ref, u.email, u.username, u.name as user_name, u.credits, u.is_admin, u.status
+            FROM user_api_keys k
+            JOIN users u ON u.id = k.user_id
+            WHERE k.key_hash = ? AND k.is_active = 1
+        `, [keyHash]);
+    }
+
+    async touchUserApiKeyLastUsed(apiKeyId) {
+        await this.run(`UPDATE user_api_keys SET last_used_at = CURRENT_TIMESTAMP WHERE id = ?`, [apiKeyId]);
     }
 
     // ========== ARTICLES MANAGEMENT ==========
@@ -1218,6 +1342,11 @@ class DatabaseService {
      * Auto-seed articles from seed-articles.js if articles table is empty
      */
     async autoSeedArticles() {
+        if (process.env.AUTO_SEED_ARTICLES !== 'true') {
+            console.log('[DB] Auto-seed articles disabled (set AUTO_SEED_ARTICLES=true to enable).');
+            return;
+        }
+
         const row = await this.get(`SELECT COUNT(*) as count FROM articles`);
         if (row?.count > 0) return;
 
