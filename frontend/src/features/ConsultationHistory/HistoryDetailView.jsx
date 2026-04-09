@@ -86,7 +86,7 @@ const HistoryDetailView = ({ item, onBack }) => {
                     </div>
                     <div className="q-meta">
                         <span>📅 {formatDateTime(item.created_at)}</span>
-                        <span>🧙‍♂️ {item.persona === 'menh_meo' ? 'Thầy Mệnh Mèo' : 'Thầy Huyền Cơ'}</span>
+                        <span>🧙‍♂️ {item.persona === 'menh_meo' ? 'Tù trưởng Bường A Lỏ' : 'Thầy Huyền Cơ'}</span>
                     </div>
                 </div>
 

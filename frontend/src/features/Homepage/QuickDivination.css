@@ -29,6 +29,37 @@
     margin-top: 2px;
 }
 
+.quick-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.quick-feature-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.6rem 0.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    transition: all 0.2s ease;
+}
+
+.quick-feature-btn:hover {
+    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(212, 175, 55, 0.08);
+    color: var(--text-primary);
+}
+
+.quick-feature-icon {
+    font-size: 0.95rem;
+}
+
 /* Topic Selection */
 .quick-topics {
     display: flex;
@@ -258,13 +289,8 @@
 }
 
 @media (max-width: 480px) {
-    .quick-topics {
-        gap: 0.5rem;
-    }
-
-    .topic-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
+    .quick-feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .cast-btn {

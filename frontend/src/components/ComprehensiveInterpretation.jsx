@@ -49,14 +49,14 @@ const ComprehensiveInterpretation = ({ data }) => {
     const personas = [
         {
             id: 'huyen_co',
-            name: 'Thầy Viet Lac So',
+            name: 'Thầy Quảng',
             icon: '🧙‍♂️',
             desc: 'Phong cách cổ kính, uyên thâm, đầy chiêm nghiệm Đông phương.',
             style: 'Trang trọng, dẫn dắt từ triết lý, trích dẫn kinh điển.'
         },
         {
             id: 'menh_meo',
-            name: 'Thầy Mệnh Mèo GenZ',
+            name: 'Tù trưởng Bường A Lỏ',
             icon: '🐱',
             desc: 'Hài hước, gần gũi, dùng ngôn ngữ Gen Z để giải thích.',
             style: 'Vui vẻ, dùng từ lóng, ví von đời thường, nhiều emoji.'

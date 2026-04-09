@@ -11,13 +11,16 @@
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
+    "countries-and-timezones": "^3.8.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
+    "luxon": "^3.7.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-helmet-async": "^2.0.5",
     "react-markdown": "^10.1.0",
-    "react-router-dom": "^7.1.1"
+    "react-router-dom": "^7.1.1",
+    "react-select": "^5.10.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
