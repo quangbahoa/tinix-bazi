@@ -1049,6 +1049,26 @@ select option,
   text-align: center;
 }
 
+.modular-form-section {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.modular-form-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.modular-form-clear-btn {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  width: auto;
+  min-width: unset;
+}
+
 .branding-header {
   margin-bottom: 3rem;
 }

@@ -8,7 +8,19 @@ import UserProfileModal from '../../components/UserProfileModal';
 import AuthModal from '../../components/AuthModal';
 import { useAuth } from '../../context/AuthContext';
 import { API_CONFIG } from '../../config/api';
-const BirthInput = ({ onAnalyze, loading }) => {
+
+const DEFAULT_FORM_DATA = {
+    name: '',
+    gender: 'Nam',
+    year: 1990,
+    month: 6,
+    day: 15,
+    hour: 10,
+    minute: 0,
+    calendar: 'solar'
+};
+
+const BirthInput = ({ onAnalyze, loading, onClearChart }) => {
     const { user, token, isAuthenticated, logout, refreshUser } = useAuth();
     const [showProfileModal, setShowProfileModal] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -32,16 +44,7 @@ const BirthInput = ({ onAnalyze, loading }) => {
                 console.error('Failed to parse saved form data:', e);
             }
         }
-        return {
-            name: '',
-            gender: 'Nam',
-            year: 1990,
-            month: 6,
-            day: 15,
-            hour: 10,
-            minute: 0,
-            calendar: 'solar'
-        };
+        return { ...DEFAULT_FORM_DATA };
     });
 
     // Save form data to sessionStorage whenever it changes
@@ -93,6 +96,14 @@ const BirthInput = ({ onAnalyze, loading }) => {
             month: date.month,
             day: date.day
         }));
+    };
+
+    const handleDoiLaSo = () => {
+        setShowDatePicker(false);
+        setFormData({ ...DEFAULT_FORM_DATA });
+        setDailyCardKey((k) => k + 1);
+        onClearChart?.();
+        setToast({ message: 'Đã xóa form và lá số đã lưu.', type: 'success' });
     };
 
     const handleSubmit = async (e) => {
@@ -224,7 +235,23 @@ const BirthInput = ({ onAnalyze, loading }) => {
             ) : null
             }
 
-            <form onSubmit={handleSubmit} className="modular-form glass-card" style={{ position: 'relative' }}>
+            <div className="modular-form-section">
+                <div className="modular-form-toolbar">
+                    <button
+                        type="button"
+                        className="premium-button small-btn modular-form-clear-btn"
+                        onClick={handleDoiLaSo}
+                        disabled={!isAuthenticated}
+                        title={
+                            isAuthenticated
+                                ? 'Xóa form và gỡ lá số đang lưu để nhập case mới'
+                                : 'Đăng nhập để đổi lá số (xóa form và gỡ lá số đã lưu)'
+                        }
+                    >
+                        Đổi Lá Số
+                    </button>
+                </div>
+                <form onSubmit={handleSubmit} className="modular-form glass-card" style={{ position: 'relative' }}>
                 {!isAuthenticated && (
                     <button
                         type="button"
@@ -313,7 +340,8 @@ const BirthInput = ({ onAnalyze, loading }) => {
                 </button>
 
 
-            </form>
+                </form>
+            </div>
 
             <QuickDivination />
 

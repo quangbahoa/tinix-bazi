@@ -28,7 +28,7 @@ import { useBaziApi } from './hooks/useBaziApi';
 import { AuthProvider } from './context/AuthContext';
 
 // Input Page Component
-const InputPage = ({ onAnalyze, loading }) => {
+const InputPage = ({ onAnalyze, loading, onClearChart }) => {
   const navigate = useNavigate();
 
   const handleAnalyze = async (params) => {
@@ -42,7 +42,7 @@ const InputPage = ({ onAnalyze, loading }) => {
     }
   };
 
-  return <BirthInput onAnalyze={handleAnalyze} loading={loading} />;
+  return <BirthInput onAnalyze={handleAnalyze} loading={loading} onClearChart={onClearChart} />;
 };
 
 // Chart Page Content
@@ -148,7 +148,7 @@ const AppContent = () => {
 
         <Routes>
           {/* Input form routes */}
-          <Route path="/" element={<InputPage onAnalyze={analyze} loading={loading} />} />
+          <Route path="/" element={<InputPage onAnalyze={analyze} loading={loading} onClearChart={clearData} />} />
           <Route path="/input" element={<Navigate to="/" replace />} />
 
           {/* Chart page */}
