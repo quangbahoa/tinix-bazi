@@ -243,6 +243,7 @@ class DatabaseService {
                 user_id INTEGER NOT NULL,
                 key_prefix TEXT NOT NULL,
                 key_hash TEXT UNIQUE NOT NULL,
+                raw_key TEXT,
                 name TEXT DEFAULT 'default',
                 is_active INTEGER DEFAULT 1,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -251,6 +252,12 @@ class DatabaseService {
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )
         `);
+        const userApiKeyColumns = await this.all(`PRAGMA table_info(user_api_keys)`);
+        const userApiKeyColumnNames = userApiKeyColumns.map(c => c.name);
+        if (!userApiKeyColumnNames.includes('raw_key')) {
+            console.log('[DB] Migrating user_api_keys: adding raw_key');
+            await this.run(`ALTER TABLE user_api_keys ADD COLUMN raw_key TEXT`);
+        }
 
         // Credit transactions table
         await this.run(`
@@ -1212,12 +1219,21 @@ class DatabaseService {
         };
     }
 
-    async createUserApiKey(userId, keyPrefix, keyHash, name = 'default') {
+    async createUserApiKey(userId, keyPrefix, keyHash, name = 'default', rawKey = null) {
         const result = await this.run(`
-            INSERT INTO user_api_keys (user_id, key_prefix, key_hash, name)
-            VALUES (?, ?, ?, ?)
-        `, [userId, keyPrefix, keyHash, name]);
+            INSERT INTO user_api_keys (user_id, key_prefix, key_hash, name, raw_key)
+            VALUES (?, ?, ?, ?, ?)
+        `, [userId, keyPrefix, keyHash, name, rawKey]);
         return result.id;
+    }
+
+    async getUserApiKeysByUserId(userId) {
+        return this.all(`
+            SELECT id, key_prefix, raw_key, name, is_active, created_at, last_used_at, revoked_at
+            FROM user_api_keys
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+        `, [userId]);
     }
 
     async getUserApiKeyByHash(keyHash) {
@@ -1231,6 +1247,26 @@ class DatabaseService {
 
     async touchUserApiKeyLastUsed(apiKeyId) {
         await this.run(`UPDATE user_api_keys SET last_used_at = CURRENT_TIMESTAMP WHERE id = ?`, [apiKeyId]);
+    }
+
+    async setUserPasswordByAdmin(userId, passwordHash) {
+        const user = await this.getUserById(userId);
+        if (!user) throw new Error('User not found');
+        await this.run(`UPDATE users SET password_hash = ? WHERE id = ?`, [passwordHash, userId]);
+        return this.getUserById(userId);
+    }
+
+    async deleteUserByAdmin(userId) {
+        const user = await this.getUserById(userId);
+        if (!user) throw new Error('User not found');
+
+        await this.run(`DELETE FROM sessions WHERE user_id = ?`, [userId]);
+        await this.run(`DELETE FROM user_api_keys WHERE user_id = ?`, [userId]);
+        await this.run(`DELETE FROM credit_requests WHERE user_id = ?`, [userId]);
+        await this.run(`DELETE FROM credit_transactions WHERE user_id = ?`, [userId]);
+        await this.run(`DELETE FROM consultations WHERE user_id = ?`, [userId]);
+        await this.run(`DELETE FROM users WHERE id = ?`, [userId]);
+        return user;
     }
 
     // ========== ARTICLES MANAGEMENT ==========

@@ -5,6 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const dbService = require('../services/database.service');
 const { authMiddleware, adminMiddleware } = require('./auth.routes');
 
@@ -12,6 +13,30 @@ const parseApiKeyFromAuthorization = (authorization) => {
     if (!authorization || typeof authorization !== 'string') return null;
     const match = authorization.match(/^ApiKey\s+(.+)$/i);
     return match ? match[1].trim() : null;
+};
+
+const hashPassword = (password) => {
+    return crypto.createHash('sha256').update(password).digest('hex');
+};
+
+const API_KEY_CHARSET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const API_KEY_PART_LENGTH = 36;
+
+const generateApiKeyPart = (length = API_KEY_PART_LENGTH) => {
+    let out = '';
+    while (out.length < length) {
+        const bytes = crypto.randomBytes(64);
+        for (const b of bytes) {
+            // 248 is highest multiple of 62 under 256, avoids modulo bias
+            if (b < 248) out += API_KEY_CHARSET[b % API_KEY_CHARSET.length];
+            if (out.length === length) break;
+        }
+    }
+    return out;
+};
+
+const generateUserApiKey = (username) => {
+    return `${username}_${generateApiKeyPart(API_KEY_PART_LENGTH)}`;
 };
 
 const manageKeyMiddleware = (req, res, next) => {
@@ -192,6 +217,58 @@ router.get('/users', async (req, res) => {
     }
 });
 
+// POST create new user by admin
+router.post('/users', async (req, res) => {
+    try {
+        const { email, password, name = '', username, status = 'active' } = req.body || {};
+
+        if (!email || !password || !username) {
+            return res.status(400).json({ error: 'Email, username và mật khẩu là bắt buộc' });
+        }
+        if (String(password).length < 6) {
+            return res.status(400).json({ error: 'Mật khẩu phải có ít nhất 6 ký tự' });
+        }
+        if (!['active', 'inactive'].includes(status)) {
+            return res.status(400).json({ error: 'status phải là active hoặc inactive' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(String(email))) {
+            return res.status(400).json({ error: 'Email không đúng định dạng' });
+        }
+        const usernameRegex = /^[A-Za-z0-9]+$/;
+        if (!usernameRegex.test(String(username))) {
+            return res.status(400).json({ error: 'Username chỉ được chứa chữ và số (A-Z, a-z, 0-9)' });
+        }
+
+        const normalizedEmail = String(email).toLowerCase().trim();
+        const normalizedUsername = String(username).trim();
+        const userId = await dbService.createUser(normalizedEmail, hashPassword(String(password)), name || '', normalizedUsername, status);
+
+        const plainApiKey = generateUserApiKey(normalizedUsername);
+        const apiKeyHash = hashPassword(plainApiKey);
+        const keyPrefix = plainApiKey.slice(0, 16);
+        await dbService.createUserApiKey(userId, keyPrefix, apiKeyHash, 'default', plainApiKey);
+
+        const user = await dbService.getUserById(userId);
+        res.status(201).json({
+            message: 'Tạo tài khoản thành công',
+            user: {
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                name: user.name,
+                credits: user.credits,
+                is_admin: user.is_admin,
+                status: user.status
+            },
+            apiKey: plainApiKey
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 // GET user by ID
 router.get('/users/:id', async (req, res) => {
     try {
@@ -200,7 +277,8 @@ router.get('/users/:id', async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
         const history = await dbService.getUserCreditHistory(user.id);
-        res.json({ ...user, credit_history: history });
+        const apiKeys = await dbService.getUserApiKeysByUserId(user.id);
+        res.json({ ...user, credit_history: history, api_keys: apiKeys });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -223,6 +301,50 @@ router.put('/users/:id', async (req, res) => {
         const userId = parseInt(req.params.id);
         const updated = await dbService.updateUserByAdmin(userId, req.body || {});
         res.json({ message: 'User updated', user: updated });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// PUT set user status active/inactive
+router.put('/users/:id/status', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const { status } = req.body || {};
+        if (!['active', 'inactive'].includes(status)) {
+            return res.status(400).json({ error: 'status phải là active hoặc inactive' });
+        }
+        const updated = await dbService.updateUserByAdmin(userId, { status });
+        res.json({ message: 'User status updated', user: updated });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// PUT admin reset/change user password
+router.put('/users/:id/password', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const { password } = req.body || {};
+        if (!password || String(password).length < 6) {
+            return res.status(400).json({ error: 'Mật khẩu phải có ít nhất 6 ký tự' });
+        }
+        const updated = await dbService.setUserPasswordByAdmin(userId, hashPassword(String(password)));
+        res.json({ message: 'Password updated', user: updated });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// DELETE remove user account by admin
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        if (req.user?.id && req.user.id === userId) {
+            return res.status(400).json({ error: 'Không thể tự xóa tài khoản đang đăng nhập' });
+        }
+        const removed = await dbService.deleteUserByAdmin(userId);
+        res.json({ message: 'User deleted', user: removed });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

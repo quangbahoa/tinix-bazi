@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
+import Select from 'react-select';
 import { useAuth } from '../../context/AuthContext';
 import AuthModal from '../../components/AuthModal';
 import { API_CONFIG } from '../../config/api';
 import { formatDateTime } from '../../utils/dateUtils';
 
 const API_BASE = API_CONFIG.ADMIN;
+const STATUS_OPTIONS = [
+    { value: 'active', label: 'active' },
+    { value: 'inactive', label: 'inactive' }
+];
 
 // ========== DASHBOARD PAGE ==========
 const DashboardPage = () => {
@@ -605,11 +610,26 @@ const UsersPage = () => {
     const { token } = useAuth();
     const [usersData, setUsersData] = useState({ users: [], total: 0 });
     const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUserDetail, setSelectedUserDetail] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [creditForm, setCreditForm] = useState({ amount: 0, reason: '' });
     const [showCreditModal, setShowCreditModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const [createdApiKey, setCreatedApiKey] = useState('');
+    const [createForm, setCreateForm] = useState({
+        email: '',
+        password: '',
+        name: '',
+        username: '',
+        status: 'active'
+    });
+    const [passwordForm, setPasswordForm] = useState({ password: '' });
+    const [actionLoading, setActionLoading] = useState(false);
+    const [statusFeedback, setStatusFeedback] = useState({ status: '', saved: false });
+    const [copiedKeyId, setCopiedKeyId] = useState(null);
 
     useEffect(() => { if (token) fetchUsers(); }, [page, searchTerm, token]);
 
@@ -640,6 +660,152 @@ const UsersPage = () => {
         } catch (err) { console.error(err); }
     };
 
+    const fetchUserDetail = async (userId) => {
+        try {
+            const res = await fetch(`${API_BASE}/users/${userId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            setSelectedUserDetail(data);
+        } catch (err) {
+            console.error(err);
+            setSelectedUserDetail(null);
+        }
+    };
+
+    const openUserModal = async (user) => {
+        setSelectedUser(user);
+        setSelectedUserDetail(null);
+        setCreditForm({ amount: user.credits, reason: '' });
+        setPasswordForm({ password: '' });
+        setStatusFeedback({ status: user.status || 'active', saved: false });
+        setShowCreditModal(true);
+        await fetchUserDetail(user.id);
+    };
+
+    const handleUpdateStatus = async (userId, status) => {
+        setActionLoading(true);
+        try {
+            await fetch(`${API_BASE}/users/${userId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            });
+            await fetchUsers();
+            await fetchUserDetail(userId);
+            setSelectedUser(prev => prev ? { ...prev, status } : prev);
+            setStatusFeedback({ status, saved: true });
+            setTimeout(() => setStatusFeedback((prev) => ({ ...prev, saved: false })), 1200);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        if (!selectedUser?.id || !passwordForm.password || passwordForm.password.length < 6) {
+            alert('Mật khẩu phải có ít nhất 6 ký tự');
+            return;
+        }
+
+        setActionLoading(true);
+        try {
+            await fetch(`${API_BASE}/users/${selectedUser.id}/password`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ password: passwordForm.password })
+            });
+            setPasswordForm({ password: '' });
+            alert('Đổi mật khẩu thành công');
+        } catch (err) {
+            console.error(err);
+            alert('Không thể đổi mật khẩu');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        if (!selectedUser?.id) return;
+        if (!confirm(`Xóa user ${selectedUser.email}? Hành động này không thể hoàn tác.`)) return;
+
+        setActionLoading(true);
+        try {
+            await fetch(`${API_BASE}/users/${selectedUser.id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setShowCreditModal(false);
+            setSelectedUser(null);
+            setSelectedUserDetail(null);
+            await fetchUsers();
+        } catch (err) {
+            console.error(err);
+            alert('Không thể xóa user');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleCreateUser = async () => {
+        if (!createForm.email || !createForm.password || !createForm.username) {
+            alert('Email, username và mật khẩu là bắt buộc');
+            return;
+        }
+        if (createForm.password.length < 6) {
+            alert('Mật khẩu phải có ít nhất 6 ký tự');
+            return;
+        }
+
+        setCreating(true);
+        try {
+            const res = await fetch(`${API_BASE}/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(createForm)
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Không thể tạo tài khoản');
+
+            setCreatedApiKey(data.apiKey || '');
+            setCreateForm({
+                email: '',
+                password: '',
+                name: '',
+                username: '',
+                status: 'active'
+            });
+            await fetchUsers();
+        } catch (err) {
+            console.error(err);
+            alert(err.message || 'Không thể tạo tài khoản');
+        } finally {
+            setCreating(false);
+        }
+    };
+
+    const handleCopyApiKey = async (keyId, rawKey) => {
+        if (!rawKey) return;
+        try {
+            await navigator.clipboard.writeText(rawKey);
+            setCopiedKeyId(keyId);
+            setTimeout(() => setCopiedKeyId(null), 1200);
+        } catch (err) {
+            console.error(err);
+            alert('Không thể copy API key');
+        }
+    };
+
     const formatDateTime = (dateStr) => {
         if (!dateStr) return 'Chưa';
         let date = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr.replace(' ', 'T') + 'Z');
@@ -652,9 +818,22 @@ const UsersPage = () => {
         <div className="admin-page-content">
             <div className="page-header">
                 <h2>👤 Quản lý tài khoản & Linh Thạch</h2>
-                <div className="search-box">
-                    <input type="text" placeholder="Tìm theo email hoặc tên..." value={searchTerm}
-                        onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }} />
+                <div className="users-header-controls">
+                    <div className="users-header-actions">
+                        <button
+                            className="btn-primary"
+                            onClick={() => {
+                                setCreatedApiKey('');
+                                setShowCreateModal(true);
+                            }}
+                        >
+                            + Tạo tài khoản
+                        </button>
+                    </div>
+                    <div className="search-box">
+                        <input type="text" placeholder="Tìm theo email hoặc tên..." value={searchTerm}
+                            onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }} />
+                    </div>
                 </div>
             </div>
 
@@ -665,8 +844,17 @@ const UsersPage = () => {
                             <span>Email</span><span>Tên</span><span>Linh Thạch</span><span>Admin</span><span>Đăng ký</span>
                         </div>
                         {usersData.users?.map(u => (
-                            <div key={u.id} className="table-row" onClick={() => { setSelectedUser(u); setCreditForm({ amount: u.credits, reason: '' }); setShowCreditModal(true); }}>
-                                <span className="cell-name">{u.email}</span>
+                            <div
+                                key={u.id}
+                                className={`table-row ${u.status === 'inactive' ? 'user-inactive' : ''}`}
+                                onClick={() => openUserModal(u)}
+                            >
+                                <span className="cell-name">
+                                    <span className={`status-dot ${u.status === 'inactive' ? 'inactive' : 'active'}`}>
+                                        {u.status === 'inactive' ? '⛔' : '✅'}
+                                    </span>
+                                    {u.email}
+                                </span>
                                 <span>{u.name || '-'}</span>
                                 <span className="credit-badge">💎 {u.credits}</span>
                                 <span>{u.is_admin ? '✅' : '-'}</span>
@@ -689,7 +877,9 @@ const UsersPage = () => {
                         <h3>💎 Điều chỉnh Linh Thạch</h3>
                         <div className="user-info-summary">
                             <div><strong>Email:</strong> {selectedUser.email}</div>
+                            <div><strong>Username:</strong> {selectedUser.username || '-'}</div>
                             <div><strong>Hiện có:</strong> {selectedUser.credits} Linh Thạch</div>
+                            <div><strong>Trạng thái:</strong> {selectedUserDetail?.status || selectedUser.status || 'active'}</div>
                         </div>
                         <div className="form-group">
                             <label>Số Linh Thạch mới</label>
@@ -713,6 +903,138 @@ const UsersPage = () => {
                         <div className="form-actions">
                             <button className="btn-secondary" onClick={() => setShowCreditModal(false)}>Hủy</button>
                             <button className="btn-primary" onClick={handleSetCredits}>Cập nhật</button>
+                        </div>
+
+                        <hr style={{ margin: '12px 0', opacity: 0.2 }} />
+
+                        <div className="form-group">
+                            <label>Kích hoạt / Khóa tài khoản</label>
+                            <div className="form-actions">
+                                <button
+                                    className={`btn-secondary status-action-btn ${statusFeedback.status === 'active' ? 'is-active' : ''} ${statusFeedback.saved && statusFeedback.status === 'active' ? 'is-saved' : ''}`}
+                                    disabled={actionLoading}
+                                    onClick={() => handleUpdateStatus(selectedUser.id, 'active')}
+                                >
+                                    ✅ Active
+                                </button>
+                                <button
+                                    className={`btn-secondary status-action-btn ${statusFeedback.status === 'inactive' ? 'is-active' : ''} ${statusFeedback.saved && statusFeedback.status === 'inactive' ? 'is-saved' : ''}`}
+                                    disabled={actionLoading}
+                                    onClick={() => handleUpdateStatus(selectedUser.id, 'inactive')}
+                                >
+                                    ⛔ Inactive
+                                </button>
+                            </div>
+                            <small className={`status-save-hint ${statusFeedback.saved ? 'is-visible' : ''}`}>
+                                Trạng thái đã được lưu.
+                            </small>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Đổi mật khẩu user</label>
+                            <input
+                                type="password"
+                                value={passwordForm.password}
+                                onChange={(e) => setPasswordForm({ password: e.target.value })}
+                                placeholder="Nhập mật khẩu mới (>= 6 ký tự)"
+                            />
+                            <div className="form-actions" style={{ marginTop: 8 }}>
+                                <button className="btn-primary" disabled={actionLoading} onClick={handleChangePassword}>
+                                    Cập nhật mật khẩu
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Raw API Keys (admin only)</label>
+                            <div className="question-list" style={{ maxHeight: 180, overflowY: 'auto' }}>
+                                {(selectedUserDetail?.api_keys || []).length === 0 ? (
+                                    <div className="empty-state">Không có API key</div>
+                                ) : (
+                                    selectedUserDetail.api_keys.map((k) => (
+                                        <div key={k.id} className="question-item api-key-item">
+                                            <div className="api-key-row api-key-meta-row">
+                                                <span className="q-text">
+                                                    <strong>Label:</strong> {k.name || 'default'}{' '}
+                                                    <span style={{ opacity: 0.8 }}>({k.is_active ? 'active' : 'inactive'})</span>
+                                                </span>
+                                            </div>
+                                            <div className="api-key-row api-key-value-row">
+                                                <span className="cell-time" title={k.raw_key || ''}>
+                                                    {k.raw_key || '(không có raw_key - key cũ)'}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    className="btn-icon"
+                                                    title="Copy API key"
+                                                    disabled={!k.raw_key}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleCopyApiKey(k.id, k.raw_key);
+                                                    }}
+                                                >
+                                                    {copiedKeyId === k.id ? '✅' : '📋'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="form-actions">
+                            <button className="btn-secondary" onClick={() => setShowCreditModal(false)}>Đóng</button>
+                            <button className="btn-reject" disabled={actionLoading} onClick={handleDeleteUser}>🗑️ Xóa user</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showCreateModal && (
+                <div className="admin-modal-overlay" onClick={() => setShowCreateModal(false)}>
+                    <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close" onClick={() => setShowCreateModal(false)}>✕</button>
+                        <h3>➕ Tạo tài khoản mới</h3>
+                        <div className="form-group">
+                            <label>Họ tên</label>
+                            <input type="text" value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} placeholder="Nhập họ tên..." />
+                        </div>
+                        <div className="form-group">
+                            <label>Username</label>
+                            <input type="text" value={createForm.username} onChange={(e) => setCreateForm({ ...createForm, username: e.target.value })} placeholder="Chỉ chữ và số" />
+                        </div>
+                        <div className="form-group">
+                            <label>Email</label>
+                            <input type="email" value={createForm.email} onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })} placeholder="email@example.com" />
+                        </div>
+                        <div className="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" value={createForm.password} onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })} placeholder="Ít nhất 6 ký tự" />
+                        </div>
+                        <div className="form-group">
+                            <label>Trạng thái</label>
+                            <Select
+                                classNamePrefix="tz-select"
+                                className="tz-react-select"
+                                options={STATUS_OPTIONS}
+                                value={STATUS_OPTIONS.find((opt) => opt.value === createForm.status) || STATUS_OPTIONS[0]}
+                                onChange={(option) => setCreateForm({ ...createForm, status: option?.value || 'active' })}
+                                isSearchable={false}
+                            />
+                        </div>
+
+                        {createdApiKey && (
+                            <div className="form-group">
+                                <label>Raw API key đã tạo</label>
+                                <input type="text" value={createdApiKey} readOnly />
+                            </div>
+                        )}
+
+                        <div className="form-actions">
+                            <button className="btn-secondary" onClick={() => setShowCreateModal(false)}>Đóng</button>
+                            <button className="btn-primary" disabled={creating} onClick={handleCreateUser}>
+                                {creating ? 'Đang tạo...' : 'Tạo tài khoản'}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -973,12 +1295,27 @@ const ArticlesAdminPage = () => {
                         </div>
                         <div className="form-group">
                             <label>Danh mục</label>
-                            <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
-                                <option value="">-- Chọn danh mục --</option>
-                                {categories.filter(c => c.slug !== 'all').map(cat => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                ))}
-                            </select>
+                            <Select
+                                classNamePrefix="tz-select"
+                                className="tz-react-select"
+                                options={[
+                                    { value: '', label: '-- Chọn danh mục --' },
+                                    ...categories
+                                        .filter((c) => c.slug !== 'all')
+                                        .map((cat) => ({ value: String(cat.id), label: cat.name }))
+                                ]}
+                                value={
+                                    [
+                                        { value: '', label: '-- Chọn danh mục --' },
+                                        ...categories
+                                            .filter((c) => c.slug !== 'all')
+                                            .map((cat) => ({ value: String(cat.id), label: cat.name }))
+                                    ].find((opt) => opt.value === String(form.category_id || '')) || { value: '', label: '-- Chọn danh mục --' }
+                                }
+                                onChange={(option) => setForm({ ...form, category_id: option?.value || '' })}
+                                isSearchable
+                                placeholder="-- Chọn danh mục --"
+                            />
                         </div>
                         <div className="form-group">
                             <label>Tóm tắt</label>
