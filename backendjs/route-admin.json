@@ -1,0 +1,42 @@
+{
+  "basePath": "/api/admin",
+  "auth": {
+    "policy": "admin",
+    "accepted": [
+      "Authorization: Bearer <admin_session_token>",
+      "Authorization: ApiKey <API_KEY_MANAGE>"
+    ]
+  },
+  "routes": [
+    { "method": "GET", "path": "/api/admin/categories", "feature": "Lấy toàn bộ danh mục câu hỏi tư vấn" },
+    { "method": "POST", "path": "/api/admin/categories", "feature": "Tạo danh mục mới" },
+    { "method": "PUT", "path": "/api/admin/categories/:id", "feature": "Cập nhật danh mục theo ID" },
+    { "method": "DELETE", "path": "/api/admin/categories/:id", "feature": "Xóa danh mục theo ID" },
+
+    { "method": "GET", "path": "/api/admin/questions", "feature": "Lấy danh sách câu hỏi (hỗ trợ lọc theo category_id)" },
+    { "method": "POST", "path": "/api/admin/questions", "feature": "Tạo câu hỏi mới" },
+    { "method": "PUT", "path": "/api/admin/questions/:id", "feature": "Cập nhật câu hỏi theo ID" },
+    { "method": "DELETE", "path": "/api/admin/questions/:id", "feature": "Xóa câu hỏi theo ID" },
+
+    { "method": "GET", "path": "/api/admin/customers", "feature": "Danh sách khách hàng có phân trang và tìm kiếm" },
+    { "method": "GET", "path": "/api/admin/customers/:id", "feature": "Chi tiết khách hàng và lịch sử tư vấn" },
+
+    { "method": "GET", "path": "/api/admin/stats", "feature": "Thống kê tổng quan hệ thống admin" },
+    { "method": "GET", "path": "/api/admin/chart-data", "feature": "Dữ liệu biểu đồ (theo ngày và theo danh mục)" },
+
+    { "method": "GET", "path": "/api/admin/users", "feature": "Danh sách user có phân trang và tìm kiếm" },
+    { "method": "GET", "path": "/api/admin/users/:id", "feature": "Chi tiết user và lịch sử biến động credits" },
+    { "method": "PUT", "path": "/api/admin/users/:id", "feature": "Cập nhật thông tin user (profile/status/username...)" },
+    { "method": "PUT", "path": "/api/admin/users/:id/credits", "feature": "Set trực tiếp số credits của user" },
+    { "method": "POST", "path": "/api/admin/users/:id/credits/deposit", "feature": "Nạp thêm credits cho user" },
+    { "method": "POST", "path": "/api/admin/users/:id/credits/withdraw", "feature": "Trừ credits của user" },
+
+    { "method": "GET", "path": "/api/admin/credit-requests", "feature": "Danh sách yêu cầu cấp credits đang chờ duyệt" },
+    { "method": "POST", "path": "/api/admin/credit-requests/:id/approve", "feature": "Duyệt yêu cầu credits" },
+    { "method": "POST", "path": "/api/admin/credit-requests/:id/reject", "feature": "Từ chối yêu cầu credits" },
+    { "method": "GET", "path": "/api/admin/credit-stats", "feature": "Thống kê credits cho dashboard" },
+
+    { "method": "GET", "path": "/api/admin/access-logs", "feature": "Xem access logs có filter và phân trang" },
+    { "method": "GET", "path": "/api/admin/access-stats", "feature": "Thống kê truy cập hệ thống" }
+  ]
+}

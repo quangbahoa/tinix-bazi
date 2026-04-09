@@ -3,6 +3,29 @@ const router = express.Router();
 const baziService = require('../services/bazi.service');
 const dbService = require('../services/database.service');
 const ganzhi = require('../bazi/ganzhi');
+const authRoutes = require('./auth.routes');
+
+// Protect only BaZi endpoints in this router (avoid affecting /api/auth/*).
+router.use([
+    '/analyze',
+    '/chart',
+    '/elements',
+    '/stars',
+    '/luck-cycles',
+    '/year-analysis',
+    '/analyze-time',
+    '/select-dates',
+    '/basic-info',
+    '/scores',
+    '/pillars',
+    '/analysis',
+    '/advanced',
+    '/dayun',
+    '/classic-texts',
+    '/luan-giai',
+    '/matching',
+    '/matching/ai'
+], authRoutes.authMiddleware);
 
 /**
  * GET /api/analyze - Full BaZi Analysis
@@ -493,7 +516,6 @@ router.post('/matching', async (req, res) => {
  * POST /api/matching/ai - Comprehensive AI Compatibility Analysis
  * Requires authentication and 25 credits
  */
-const authRoutes = require('./auth.routes');
 const CREDIT_COST_MATCHING_AI = 25;
 
 router.post('/matching/ai', authRoutes.authMiddleware, async (req, res) => {

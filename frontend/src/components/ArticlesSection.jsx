@@ -22,7 +22,11 @@ const ArticlesSection = () => {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/categories`);
+            const authToken = localStorage.getItem('auth_token');
+            if (!authToken) return;
+            const res = await fetch(`${API_CONFIG.BASE_URL}/articles/categories`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
             const data = await res.json();
             if (data.success) {
                 setCategories(data.categories || []);
@@ -35,12 +39,20 @@ const ArticlesSection = () => {
     const fetchArticles = async () => {
         setLoading(true);
         try {
+            const authToken = localStorage.getItem('auth_token');
+            if (!authToken) {
+                setArticles([]);
+                setLoading(false);
+                return;
+            }
             const params = new URLSearchParams({
                 category: activeCategory,
                 page: page.toString(),
                 limit: '5'
             });
-            const res = await fetch(`${API_CONFIG.BASE_URL}/articles?${params}`);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/articles?${params}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
             const data = await res.json();
             if (data.success) {
                 setArticles(data.articles || []);

@@ -84,11 +84,16 @@ export const AuthProvider = ({ children }) => {
         return data;
     };
 
-    const register = async (email, password, name, captchaToken, captchaAnswer) => {
+    const register = async (email, password, name, username, inviteCode) => {
+        const headers = { 'Content-Type': 'application/json' };
+        if (inviteCode) {
+            headers['Authorization'] = `ApiKey ${inviteCode}`;
+        }
+
         const res = await fetch(`${API_BASE}/register`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, name, captchaToken, captchaAnswer })
+            headers,
+            body: JSON.stringify({ email, password, name, username, inviteCode })
         });
 
         const data = await res.json();

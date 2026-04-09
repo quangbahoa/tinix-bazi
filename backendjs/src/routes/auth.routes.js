@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const dbService = require('../services/database.service');
+const { authenticateApiKey } = require('../middleware/apiKeyAuth');
 
 // Simple hash function (for demo - use bcrypt in production)
 const hashPassword = (password) => {
@@ -22,6 +23,16 @@ const captchaStore = new Map();
 // Generate session token
 const generateToken = () => {
     return crypto.randomBytes(32).toString('hex');
+};
+
+const parseApiKeyFromAuthorization = (authorization) => {
+    if (!authorization || typeof authorization !== 'string') return null;
+    const match = authorization.match(/^ApiKey\s+(.+)$/i);
+    return match ? match[1].trim() : null;
+};
+
+const generateUserApiKey = (username) => {
+    return `${username}_${crypto.randomBytes(32).toString('base64url')}`;
 };
 
 // Generate CAPTCHA challenge
@@ -95,6 +106,10 @@ router.get('/captcha', (req, res) => {
 
 // Middleware to check authentication
 const authMiddleware = async (req, res, next) => {
+    if (/^ApiKey\s+/i.test(req.headers.authorization || '')) {
+        return authenticateApiKey(req, res, next);
+    }
+
     const token = req.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
@@ -107,7 +122,25 @@ const authMiddleware = async (req, res, next) => {
             return res.status(401).json({ error: 'Phiên đăng nhập hết hạn' });
         }
 
-        req.user = session.user;
+        const user = await dbService.getUserById(session.user_id);
+        if (!user) {
+            await dbService.deleteSession(token);
+            return res.status(401).json({ error: 'Người dùng không tồn tại' });
+        }
+        if (user.status && user.status !== 'active') {
+            await dbService.deleteSession(token);
+            return res.status(403).json({ error: 'Tài khoản đã bị khóa' });
+        }
+
+        req.user = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            name: user.name,
+            credits: user.credits,
+            is_admin: user.is_admin,
+            status: user.status
+        };
         req.token = token;
         next();
     } catch (error) {
@@ -116,28 +149,34 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
+const authOrApiKeyMiddleware = async (req, res, next) => {
+    const authHeader = req.headers.authorization || '';
+    if (/^ApiKey\s+/i.test(authHeader)) {
+        return authenticateApiKey(req, res, next);
+    }
+    return authMiddleware(req, res, next);
+};
+
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
     console.log('--- REGISTER REQUEST ---');
     console.log('[AUTH] Register attempt for:', req.body?.email || 'unknown');
     try {
-        const { email, password, name, captchaToken, captchaAnswer } = req.body;
+        const { email, password, name, username, inviteCode } = req.body;
 
-        // Verify CAPTCHA first
-        if (!captchaToken || captchaAnswer === undefined || captchaAnswer === '') {
-            console.warn('[AUTH] Register failed: Missing CAPTCHA');
-            return res.status(400).json({ error: 'Vui lòng hoàn thành xác thực' });
+        const registerKey = process.env.API_KEY_REGISTER;
+        const headerApiKey = parseApiKeyFromAuthorization(req.headers.authorization);
+        const providedApiKey = headerApiKey || inviteCode;
+        if (!registerKey) {
+            return res.status(500).json({ error: 'API_KEY_REGISTER chưa được cấu hình' });
+        }
+        if (!providedApiKey || providedApiKey !== registerKey) {
+            return res.status(403).json({ error: 'API key đăng ký không hợp lệ' });
         }
 
-        const captchaResult = verifyCaptcha(captchaToken, captchaAnswer);
-        if (!captchaResult.valid) {
-            console.warn('[AUTH] Register failed: Invalid CAPTCHA');
-            return res.status(400).json({ error: captchaResult.error, refreshCaptcha: true });
-        }
-
-        if (!email || !password) {
-            console.warn('[AUTH] Register failed: Missing email or password');
-            return res.status(400).json({ error: 'Email và mật khẩu là bắt buộc' });
+        if (!email || !password || !username) {
+            console.warn('[AUTH] Register failed: Missing email/password/username');
+            return res.status(400).json({ error: 'Email, username và mật khẩu là bắt buộc' });
         }
 
         if (password.length < 6) {
@@ -151,12 +190,22 @@ router.post('/register', async (req, res) => {
             console.warn('[AUTH] Register failed: Invalid email format');
             return res.status(400).json({ error: 'Email không đúng định dạng' });
         }
+        const usernameRegex = /^[A-Za-z0-9]+$/;
+        if (!usernameRegex.test(username)) {
+            return res.status(400).json({ error: 'Username chỉ được chứa chữ và số (A-Z, a-z, 0-9)' });
+        }
 
         const passwordHash = hashPassword(password);
         console.log(`[AUTH] Creating user: ${email.toLowerCase().trim()}`);
 
-        const userId = await dbService.createUser(email.toLowerCase().trim(), passwordHash, name || '');
+        const normalizedUsername = username.trim();
+        const userId = await dbService.createUser(email.toLowerCase().trim(), passwordHash, name || '', normalizedUsername, 'active');
         console.log(`[AUTH] User created with ID: ${userId}`);
+
+        const plainApiKey = generateUserApiKey(normalizedUsername);
+        const apiKeyHash = hashPassword(plainApiKey);
+        const keyPrefix = plainApiKey.slice(0, 16);
+        await dbService.createUserApiKey(userId, keyPrefix, apiKeyHash, 'default');
 
         // Auto login after registration
         const user = await dbService.getUserById(userId);
@@ -168,9 +217,11 @@ router.post('/register', async (req, res) => {
             const fallbackUser = {
                 id: userId,
                 email: email.toLowerCase().trim(),
+                username: normalizedUsername,
                 name: name || '',
                 credits: 100,
-                is_admin: 0
+                is_admin: 0,
+                status: 'active'
             };
             const token = generateToken();
             await dbService.createSession(token, fallbackUser);
@@ -178,12 +229,13 @@ router.post('/register', async (req, res) => {
             return res.json({
                 message: 'Đăng ký thành công! Bạn nhận được 100 Linh Thạch',
                 token,
-                user: fallbackUser
+                user: fallbackUser,
+                apiKey: plainApiKey
             });
         }
 
         const token = generateToken();
-        const userData = { id: user.id, email: user.email, name: user.name, credits: user.credits, is_admin: user.is_admin };
+        const userData = { id: user.id, email: user.email, username: user.username, name: user.name, credits: user.credits, is_admin: user.is_admin, status: user.status };
         await dbService.createSession(token, userData);
 
         await dbService.updateLastLogin(userId);
@@ -193,7 +245,8 @@ router.post('/register', async (req, res) => {
         res.json({
             message: 'Đăng ký thành công! Bạn nhận được 100 Linh Thạch',
             token,
-            user: { id: user.id, email: user.email, name: user.name, credits: user.credits, is_admin: user.is_admin }
+            user: { id: user.id, email: user.email, username: user.username, name: user.name, credits: user.credits, is_admin: user.is_admin, status: user.status },
+            apiKey: plainApiKey
         });
     } catch (error) {
         console.error('[AUTH] Register error:', error.message);
@@ -219,6 +272,9 @@ router.post('/login', async (req, res) => {
             console.warn(`[AUTH] Login Failed: User NOT FOUND -> "${email}"`);
             return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
         }
+        if (user.status && user.status !== 'active') {
+            return res.status(403).json({ error: 'Tài khoản đã bị khóa' });
+        }
 
         const passwordHash = hashPassword(password);
         if (user.password_hash !== passwordHash) {
@@ -228,7 +284,7 @@ router.post('/login', async (req, res) => {
 
         console.log(`[AUTH] Login Success: "${email}" (is_admin: ${user.is_admin})`);
         const token = generateToken();
-        const userData = { id: user.id, email: user.email, name: user.name, credits: user.credits, is_admin: user.is_admin };
+        const userData = { id: user.id, email: user.email, username: user.username, name: user.name, credits: user.credits, is_admin: user.is_admin, status: user.status };
         await dbService.createSession(token, userData);
 
         await dbService.updateLastLogin(user.id);
@@ -236,7 +292,7 @@ router.post('/login', async (req, res) => {
         res.json({
             message: 'Đăng nhập thành công',
             token,
-            user: { id: user.id, email: user.email, name: user.name, credits: user.credits, is_admin: user.is_admin }
+            user: { id: user.id, email: user.email, username: user.username, name: user.name, credits: user.credits, is_admin: user.is_admin, status: user.status }
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -255,7 +311,12 @@ router.get('/me', authMiddleware, async (req, res) => {
         }
 
         // Update session with fresh credits
-        const userData = { id: user.id, email: user.email, name: user.name, credits: user.credits, is_admin: user.is_admin };
+        if (user.status && user.status !== 'active') {
+            await dbService.deleteSession(req.token);
+            return res.status(403).json({ error: 'Tài khoản đã bị khóa' });
+        }
+
+        const userData = { id: user.id, email: user.email, username: user.username, name: user.name, credits: user.credits, is_admin: user.is_admin, status: user.status };
         await dbService.createSession(req.token, userData); // Overwrites with fresh data
 
         let baziData = null;
@@ -269,9 +330,11 @@ router.get('/me', authMiddleware, async (req, res) => {
             user: {
                 id: user.id,
                 email: user.email,
+                username: user.username,
                 name: user.name,
                 credits: user.credits,
                 is_admin: user.is_admin,
+                status: user.status,
                 bazi_data: baziData
             }
         });
@@ -362,6 +425,8 @@ const adminMiddleware = (req, res, next) => {
 
 // Export middleware for use in other routes
 router.authMiddleware = authMiddleware;
+router.apiKeyMiddleware = authenticateApiKey;
+router.authOrApiKeyMiddleware = authOrApiKeyMiddleware;
 router.adminMiddleware = adminMiddleware;
 // router.sessions = sessions; // Removed for DB sessions
 

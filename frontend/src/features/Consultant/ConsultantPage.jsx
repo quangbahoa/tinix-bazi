@@ -122,18 +122,27 @@ const ConsultantPage = ({ userData }) => {
 
     // Fetch Themes on mount
     useEffect(() => {
-        fetch(`${API_BASE}/themes`)
+        const authToken = token || localStorage.getItem('auth_token');
+        if (!authToken) return;
+
+        fetch(`${API_BASE}/themes`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        })
             .then(res => res.json())
             .then(data => setThemes(data))
             .catch(err => console.error('Error fetching themes:', err));
-    }, []);
+    }, [token]);
 
 
     // Fetch Questions when theme changes
     useEffect(() => {
         if (selectedTheme) {
+            const authToken = token || localStorage.getItem('auth_token');
+            if (!authToken) return;
             setLoading(true);
-            fetch(`${API_BASE}/questions/${selectedTheme.id}`)
+            fetch(`${API_BASE}/questions/${selectedTheme.id}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            })
                 .then(res => res.json())
                 .then(data => {
                     setQuestions(data);
@@ -144,7 +153,7 @@ const ConsultantPage = ({ userData }) => {
                     setLoading(false);
                 });
         }
-    }, [selectedTheme]);
+    }, [selectedTheme, token]);
 
     const handleSelectTheme = (theme) => {
         setSelectedTheme(theme);
@@ -303,7 +312,7 @@ const ConsultantPage = ({ userData }) => {
     const personas = [
         {
             id: 'huyen_co',
-            name: 'Thầy Huyền Cơ Bát Tự',
+            name: 'Thầy Viet Lac So',
             icon: '🧙‍♂️',
             title: 'Bậc Thầy Bát Tự',
             desc: '35 năm kinh nghiệm, nhân văn, uyên bác.'
@@ -421,7 +430,7 @@ const ConsultantPage = ({ userData }) => {
             {step === 1 && (
                 <div className="consult-welcome-intro fade-in">
                     <h2 className="mystical-welcome-text">
-                        Hãy chọn câu hỏi về cuộc đời, Huyền cơ Bát tự sẽ giúp bạn giải đáp mọi thứ.
+                        Hãy chọn câu hỏi về cuộc đời, Viet Lac So sẽ giúp bạn giải đáp mọi thứ.
                     </h2>
                 </div>
             )}

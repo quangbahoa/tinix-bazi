@@ -1,4 +1,5 @@
 const BASE_URL = '/api';
+const getAuthToken = () => localStorage.getItem('auth_token');
 
 export const apiClient = {
     get: async (endpoint, params = {}) => {
@@ -14,11 +15,15 @@ export const apiClient = {
 
         console.log(`[API] Fetching: ${url.toString()}`);
 
-        const response = await fetch(url.toString(), {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        const token = getAuthToken();
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        if (token && token !== 'null' && token !== 'undefined') {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(url.toString(), { headers });
 
         if (!response.ok) {
             throw new Error(`API Error: ${response.status} ${response.statusText}`);
@@ -31,11 +36,17 @@ export const apiClient = {
 
         console.log(`[API] Posting: ${url.toString()}`);
 
+        const token = getAuthToken();
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        if (token && token !== 'null' && token !== 'undefined') {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch(url.toString(), {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers,
             body: JSON.stringify(data)
         });
 

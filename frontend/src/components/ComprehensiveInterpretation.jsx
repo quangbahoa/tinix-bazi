@@ -16,41 +16,16 @@ const ComprehensiveInterpretation = ({ data }) => {
     const [followUpQuestions, setFollowUpQuestions] = useState([]);
     const [error, setError] = useState(null);
     const [showFAB, setShowFAB] = useState(false);
-    const [suggestions, setSuggestions] = useState([]);
-    const [randomSuggestion, setRandomSuggestion] = useState(null);
+    const randomSuggestion = null; // server suggestions disabled; FAB uses interpret/consult rotation
     const [fabMode, setFabMode] = useState('interpret'); // 'interpret' or 'consult'
 
     // Toggle FAB mode for new users every 5 seconds
     useEffect(() => {
-        if (!randomSuggestion) {
-            const interval = setInterval(() => {
-                setFabMode(prev => prev === 'interpret' ? 'consult' : 'interpret');
-            }, 5000);
-            return () => clearInterval(interval);
-        }
-    }, [randomSuggestion]);
-
-    // Fetch suggestions if authenticated
-    useEffect(() => {
-        if (isAuthenticated && token) {
-            fetch(`${API_CONFIG.AUTH}/suggestions?limit=10`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-                .then(res => {
-                    if (res.status === 401) return { suggestions: [] };
-                    if (!res.ok) throw new Error('Fetch failed');
-                    return res.json();
-                })
-                .then(data => {
-                    const qs = data.suggestions || [];
-                    setSuggestions(qs);
-                    if (qs.length > 0) {
-                        setRandomSuggestion(qs[Math.floor(Math.random() * qs.length)]);
-                    }
-                })
-                .catch(err => console.error('Failed to fetch suggestions:', err));
-        }
-    }, [isAuthenticated, token]);
+        const interval = setInterval(() => {
+            setFabMode(prev => prev === 'interpret' ? 'consult' : 'interpret');
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Monitor scroll for Floating Action Button
     useEffect(() => {
@@ -74,7 +49,7 @@ const ComprehensiveInterpretation = ({ data }) => {
     const personas = [
         {
             id: 'huyen_co',
-            name: 'Thầy Huyền Cơ Bát Tự',
+            name: 'Thầy Viet Lac So',
             icon: '🧙‍♂️',
             desc: 'Phong cách cổ kính, uyên thâm, đầy chiêm nghiệm Đông phương.',
             style: 'Trang trọng, dẫn dắt từ triết lý, trích dẫn kinh điển.'
