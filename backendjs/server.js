@@ -114,7 +114,7 @@ app.use('/api/que', queRoutes);
 // app.use('/api/daily', dailyRoutes);
 
 const apiMetaJson = () => ({
-    name: 'BaZi Mega-Evolution API',
+    name: 'VietLac BaZi API',
     version: '2.1',
     status: 'running',
     docs: '/api/docs'
@@ -200,7 +200,7 @@ process.once('SIGUSR2', () => {
         console.log('[STARTUP] Database initialized successfully.');
 
         app.listen(PORT, () => {
-            console.log(`🚀 BaZi Mega-Evolution API running on port ${PORT}`);
+            console.log(`🚀 VietLac BaZi API running on port ${PORT}`);
             if (serveSpa) console.log(`🌐 SPA static: ${staticDir}`);
             console.log(`📚 API Docs (local): http://localhost:${PORT}/api/docs`);
             console.log(`💾 SQLite Database: data/bazi_consultant.db`);
